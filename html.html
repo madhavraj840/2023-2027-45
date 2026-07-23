@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Heavy Metal Pollution Indices | SIH 2025 – Statement 25067</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  /* ── TOKENS ───────────────────────────────────────────── */
+  :root {
+    --navy:    #0B1F33;
+    --navy2:   #0F2A44;
+    --teal:    #00AFCC;
+    --teal2:   #007A8F;
+    --amber:   #F59E0B;
+    --red:     #EF4444;
+    --green:   #22C55E;
+    --white:   #F0F4F8;
+    --muted:   #8BA3B8;
+    --card:    #112236;
+    --border:  #1E3A55;
+    --font-h:  'Space Grotesk', sans-serif;
+    --font-b:  'Inter', sans-serif;
+    --font-m:  'Space Mono', monospace;
+  }
+
+  /* ── RESET ───────────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--navy);
+    color: var(--white);
+    font-family: var(--font-b);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+  a { color: var(--teal); text-decoration: none; }
+
+  /* ── NAV ─────────────────────────────────────────────── */
+  nav {
+    position: sticky; top: 0; z-index: 100;
+    background: rgba(11,31,51,.92);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2rem; height: 56px;
+  }
+  .nav-brand {
+    font-family: var(--font-h); font-weight: 700;
+    font-size: 1rem; color: var(--teal); letter-spacing: .5px;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .nav-brand span { color: var(--white); font-weight: 400; font-size:.85rem; }
+  .nav-links { display: flex; gap: 1.5rem; }
+  .nav-links a {
+    font-size: .82rem; color: var(--muted); font-weight: 500;
+    transition: color .2s;
+  }
+  .nav-links a:hover { color: var(--white); }
+
+  /* ── HERO ────────────────────────────────────────────── */
+  .hero {
+    position: relative; overflow: hidden;
+    padding: 5rem 2rem 4rem;
+    text-align: center;
+    background: radial-gradient(ellipse 80% 60% at 50% 0%, #0E3356 0%, var(--navy) 70%);
+    border-bottom: 1px solid var(--border);
+  }
+  .hero-badge {
+    display: inline-block;
+    font-family: var(--font-m); font-size: .7rem;
+    color: var(--teal); background: rgba(0,175,204,.1);
+    border: 1px solid rgba(0,175,204,.3);
+    padding: .3rem .8rem; border-radius: 2rem; margin-bottom: 1.5rem;
+    letter-spacing: .8px;
+  }
+  .hero h1 {
+    font-family: var(--font-h); font-size: clamp(1.8rem,4vw,3rem);
+    font-weight: 700; line-height: 1.15;
+    max-width: 740px; margin: 0 auto .9rem;
+  }
+  .hero h1 em { color: var(--teal); font-style: normal; }
+  .hero p {
+    color: var(--muted); max-width: 560px; margin: 0 auto 2rem;
+    font-size: .95rem;
+  }
+  .hero-cta {
+    display: inline-flex; gap: .75rem; flex-wrap: wrap; justify-content: center;
+  }
+  .btn {
+    padding: .6rem 1.4rem; border-radius: 6px;
+    font-family: var(--font-h); font-size: .85rem; font-weight: 600;
+    cursor: pointer; transition: all .2s; border: none;
+  }
+  .btn-primary { background: var(--teal); color: var(--navy); }
+  .btn-primary:hover { background: #00CCEE; }
+  .btn-outline { background: transparent; color: var(--teal); border: 1px solid var(--teal); }
+  .btn-outline:hover { background: rgba(0,175,204,.1); }
+
+  /* floating molecules */
+  .mol {
+    position: absolute; border-radius: 50%; opacity: .05;
+    background: var(--teal); pointer-events: none;
+    animation: float 8s ease-in-out infinite;
+  }
+  @keyframes float {
+    0%,100% { transform: translateY(0) scale(1); }
+    50%      { transform: translateY(-18px) scale(1.05); }
+  }
+
+  /* ── INDEX CARDS (HERO STATS) ─────────────────────────── */
+  .index-strip {
+    display: flex; flex-wrap: wrap; gap: .6rem;
+    justify-content: center; margin-top: 2.5rem;
+  }
+  .index-chip {
+    font-family: var(--font-m); font-size: .72rem;
+    background: var(--card); border: 1px solid var(--border);
+    padding: .35rem .75rem; border-radius: 4px; color: var(--teal);
+  }
+
+  /* ── SECTION HELPERS ─────────────────────────────────── */
+  section { padding: 3rem 2rem; }
+  .container { max-width: 1060px; margin: 0 auto; }
+  .section-label {
+    font-family: var(--font-m); font-size: .7rem;
+    color: var(--teal); letter-spacing: 1.5px; text-transform: uppercase;
+    margin-bottom: .4rem;
+  }
+  .section-title {
+    font-family: var(--font-h); font-size: 1.5rem; font-weight: 700;
+    margin-bottom: .5rem;
+  }
+  .section-sub { color: var(--muted); font-size: .88rem; margin-bottom: 2rem; }
+
+  /* ── TABS ────────────────────────────────────────────── */
+  .tabs { display: flex; gap: .3rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
+  .tab {
+    padding: .5rem 1.1rem; border-radius: 6px;
+    font-family: var(--font-h); font-size: .82rem; font-weight: 600;
+    cursor: pointer; border: 1px solid var(--border);
+    background: transparent; color: var(--muted); transition: all .2s;
+  }
+  .tab.active { background: var(--teal); color: var(--navy); border-color: var(--teal); }
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* ── METAL TABLE INPUT ────────────────────────────────── */
+  .metal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: .75rem; margin-bottom: 1.5rem;
+  }
+  .metal-row {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: .75rem 1rem;
+    display: flex; flex-direction: column; gap: .35rem;
+  }
+  .metal-row label {
+    font-family: var(--font-h); font-size: .8rem; font-weight: 600;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .metal-row label .std {
+    font-family: var(--font-m); font-size: .65rem; color: var(--muted);
+  }
+  .metal-row input {
+    background: var(--navy); border: 1px solid var(--border);
+    color: var(--white); font-family: var(--font-m); font-size: .88rem;
+    padding: .4rem .6rem; border-radius: 4px; width: 100%;
+    outline: none; transition: border .2s;
+  }
+  .metal-row input:focus { border-color: var(--teal); }
+  .metal-row .unit { font-size: .65rem; color: var(--muted); text-align: right; }
+
+  /* ── RESULTS ─────────────────────────────────────────── */
+  .results-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: .75rem; margin-top: 1.5rem;
+  }
+  .result-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1.1rem 1.2rem;
+    position: relative; overflow: hidden;
+  }
+  .result-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+    background: var(--teal);
+  }
+  .result-card.level-low::before  { background: var(--green); }
+  .result-card.level-med::before  { background: var(--amber); }
+  .result-card.level-high::before { background: #F97316; }
+  .result-card.level-crit::before { background: var(--red); }
+
+  .result-card h4 {
+    font-family: var(--font-m); font-size: .68rem; color: var(--muted);
+    text-transform: uppercase; letter-spacing: 1px; margin-bottom: .3rem;
+  }
+  .result-value {
+    font-family: var(--font-h); font-size: 2rem; font-weight: 700;
+    line-height: 1;
+  }
+  .result-card.level-low  .result-value { color: var(--green); }
+  .result-card.level-med  .result-value { color: var(--amber); }
+  .result-card.level-high .result-value { color: #F97316; }
+  .result-card.level-crit .result-value { color: var(--red); }
+  .result-status {
+    font-size: .75rem; font-weight: 600; margin-top: .3rem;
+    font-family: var(--font-h);
+  }
+  .result-card.level-low  .result-status { color: var(--green); }
+  .result-card.level-med  .result-status { color: var(--amber); }
+  .result-card.level-high .result-status { color: #F97316; }
+  .result-card.level-crit .result-status { color: var(--red); }
+
+  /* gauge */
+  .gauge-wrap {
+    display: flex; justify-content: center; margin: 1.5rem 0;
+  }
+  .gauge-svg { width: 200px; height: 130px; }
+  .gauge-track { fill: none; stroke: var(--border); stroke-width: 16; }
+  .gauge-fill  { fill: none; stroke-width: 16; stroke-linecap: round;
+    transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1), stroke .5s; }
+
+  /* chart canvas */
+  .chart-wrap {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem; margin-top: 1rem;
+  }
+  .chart-wrap canvas { max-height: 280px; }
+
+  /* ── FORMULA BOX ─────────────────────────────────────── */
+  .formula-box {
+    background: rgba(0,175,204,.05);
+    border: 1px solid rgba(0,175,204,.2);
+    border-radius: 6px; padding: .75rem 1rem;
+    font-family: var(--font-m); font-size: .78rem;
+    color: var(--teal); margin-bottom: 1rem; line-height: 1.8;
+  }
+  .formula-box strong { color: var(--white); }
+
+  /* ── CLASSIFICATION TABLE ────────────────────────────── */
+  .ref-section { background: var(--navy2); }
+  table { width: 100%; border-collapse: collapse; font-size: .83rem; }
+  thead th {
+    font-family: var(--font-h); font-size: .72rem; letter-spacing: .5px;
+    text-transform: uppercase; padding: .65rem .9rem;
+    background: var(--card); color: var(--muted); text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  tbody tr { border-bottom: 1px solid var(--border); }
+  tbody tr:hover { background: var(--card); }
+  tbody td { padding: .6rem .9rem; }
+  .dot {
+    display: inline-block; width: 9px; height: 9px;
+    border-radius: 50%; margin-right: 6px;
+  }
+
+  /* ── METALS INFO CARDS ─────────────────────────────────── */
+  .info-grid {
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: .75rem; margin-top: 1.5rem;
+  }
+  .info-card {
+    background: var(--card); border: 1px solid var(--border);
+    border-radius: 8px; padding: 1rem 1.2rem;
+  }
+  .info-card h4 {
+    font-family: var(--font-h); font-weight: 600; font-size: .88rem;
+    margin-bottom: .4rem; color: var(--teal);
+  }
+  .info-card p { font-size: .78rem; color: var(--muted); line-height: 1.5; }
+
+  /* ── ABOUT ────────────────────────────────────────────── */
+  .about-wrap {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
+    align-items: start;
+  }
+  @media (max-width: 640px) {
+    .about-wrap { grid-template-columns: 1fr; }
+    .nav-links { display: none; }
+  }
+
+  /* ── FOOTER ──────────────────────────────────────────── */
+  footer {
+    background: var(--navy2); border-top: 1px solid var(--border);
+    padding: 1.5rem 2rem; text-align: center;
+    font-size: .75rem; color: var(--muted);
+    font-family: var(--font-m);
+  }
+  footer span { color: var(--teal); }
+
+  /* ── MISC ─────────────────────────────────────────────── */
+  .calc-btn {
+    background: var(--teal); color: var(--navy);
+    padding: .65rem 1.8rem; border: none; border-radius: 6px;
+    font-family: var(--font-h); font-size: .9rem; font-weight: 700;
+    cursor: pointer; transition: all .2s; margin-top: .5rem;
+  }
+  .calc-btn:hover { background: #00CCEE; transform: translateY(-1px); }
+  .reset-btn {
+    background: transparent; color: var(--muted);
+    padding: .65rem 1.2rem; border: 1px solid var(--border); border-radius: 6px;
+    font-family: var(--font-h); font-size: .85rem; font-weight: 500;
+    cursor: pointer; transition: all .2s; margin-top: .5rem; margin-left: .5rem;
+  }
+  .reset-btn:hover { color: var(--white); border-color: var(--muted); }
+  .hidden { display: none; }
+  .divider { height: 1px; background: var(--border); margin: 2rem 0; }
+  .note { font-size: .75rem; color: var(--muted); margin-top: .5rem; }
+  .tip {
+    background: rgba(245,158,11,.07); border: 1px solid rgba(245,158,11,.2);
+    border-radius: 6px; padding: .6rem .9rem; font-size: .78rem;
+    color: var(--amber); margin-bottom: 1rem;
+  }
+  .tip b { color: #FCD34D; }
+</style>
+</head>
+<body>
+
+<!-- ── NAV ─────────────────────────────────────────────── -->
+<nav>
+  <div class="nav-brand">
+    ◈ HMPIx <span>Heavy Metal Pollution Indices</span>
+  </div>
+  <div class="nav-links">
+    <a href="#calculator">Calculator</a>
+    <a href="#reference">Reference</a>
+    <a href="#metals">Metals</a>
+    <a href="#about">About</a>
+  </div>
+</nav>
+
+<!-- ── HERO ────────────────────────────────────────────── -->
+<section class="hero">
+  <div class="mol" style="width:300px;height:300px;top:-80px;left:-60px;animation-delay:0s"></div>
+  <div class="mol" style="width:180px;height:180px;top:20px;right:40px;animation-delay:3s"></div>
+  <div class="mol" style="width:80px;height:80px;bottom:20px;left:30%;animation-delay:1.5s"></div>
+
+  <div class="hero-badge">SIH 2025 — Problem Statement 25067</div>
+  <h1>Design & Development of<br/><em>Heavy Metal Pollution Indices</em></h1>
+  <p>A scientific tool to quantify, classify, and visualize heavy metal contamination in water and soil using established environmental indices.</p>
+  <div class="hero-cta">
+    <a href="#calculator" class="btn btn-primary">Open Calculator</a>
+    <a href="#reference" class="btn btn-outline">View Classifications</a>
+  </div>
+
+  <div class="index-strip">
+    <div class="index-chip">HPI — Water Pollution</div>
+    <div class="index-chip">Nemerow Index</div>
+    <div class="index-chip">Igeo — Geoaccumulation</div>
+    <div class="index-chip">CF — Contamination Factor</div>
+    <div class="index-chip">PLI — Pollution Load</div>
+    <div class="index-chip">RI — Ecological Risk</div>
+  </div>
+</section>
+
+<!-- ── CALCULATOR ───────────────────────────────────────── -->
+<section id="calculator">
+<div class="container">
+  <div class="section-label">Interactive Tool</div>
+  <div class="section-title">Pollution Index Calculator</div>
+  <div class="section-sub">Enter measured concentrations of heavy metals in your sample. All calculations follow internationally accepted environmental standards.</div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('water')">💧 Water Quality (HPI &amp; Nemerow)</button>
+    <button class="tab" onclick="switchTab('soil')">🌍 Soil/Sediment (Igeo, CF, PLI, RI)</button>
+  </div>
+
+  <!-- ── WATER TAB ──────────────────────────────────────── -->
+  <div id="tab-water" class="tab-panel active">
+    <div class="formula-box">
+      <strong>Heavy Metal Pollution Index (HPI)</strong><br/>
+      HPI = Σ(Wᵢ × Qᵢ) / Σ(Wᵢ) &nbsp;|&nbsp; Wᵢ = 1/Sᵢ (inverse of standard) &nbsp;|&nbsp; Qᵢ = 100 × (Mᵢ − Iᵢ) / (Sᵢ − Iᵢ)<br/>
+      <strong>Nemerow Pollution Index (NPI)</strong><br/>
+      NPI = √[(P̄²+ P²max) / 2] &nbsp;|&nbsp; Pᵢ = Cᵢ / Sᵢ &nbsp;(single-factor index)
+    </div>
+
+    <div class="tip"><b>Tip:</b> Leave any metal blank to exclude it from the calculation. Values in mg/L. Standard limits from WHO / BIS IS 10500.</div>
+
+    <div class="metal-grid" id="water-inputs"></div>
+    <div>
+      <button class="calc-btn" onclick="calcWater()">Calculate Indices</button>
+      <button class="reset-btn" onclick="resetWater()">Reset</button>
+    </div>
+
+    <div id="water-results" class="hidden">
+      <div class="divider"></div>
+      <div class="section-label">Results</div>
+
+      <!-- Gauge -->
+      <div class="gauge-wrap">
+        <svg class="gauge-svg" viewBox="0 0 200 120">
+          <path class="gauge-track" d="M 20 100 A 80 80 0 0 1 180 100" />
+          <path class="gauge-fill" id="gauge-path" d="M 20 100 A 80 80 0 0 1 180 100"
+            stroke-dasharray="251" stroke-dashoffset="251" stroke="var(--teal)" />
+          <text id="gauge-val" x="100" y="90" text-anchor="middle"
+            font-family="Space Grotesk" font-size="22" font-weight="700" fill="white">—</text>
+          <text x="100" y="108" text-anchor="middle"
+            font-family="Space Mono" font-size="10" fill="#8BA3B8">HPI VALUE</text>
+          <text x="22" y="115" font-family="Space Mono" font-size="9" fill="#8BA3B8">0</text>
+          <text x="168" y="115" font-family="Space Mono" font-size="9" fill="#8BA3B8">300+</text>
+        </svg>
+      </div>
+
+      <div class="results-grid" id="water-result-cards"></div>
+
+      <div class="chart-wrap" style="margin-top:1rem;">
+        <canvas id="water-chart"></canvas>
+      </div>
+
+      <div id="water-detail-table" style="margin-top:1rem; overflow-x:auto;"></div>
+    </div>
+  </div>
+
+  <!-- ── SOIL TAB ───────────────────────────────────────── -->
+  <div id="tab-soil" class="tab-panel">
+    <div class="formula-box">
+      <strong>Geoaccumulation Index (Igeo)</strong> = log₂ [ Cₙ / (1.5 × Bₙ) ]<br/>
+      <strong>Contamination Factor (CF)</strong> = Cₙ / Bₙ<br/>
+      <strong>Pollution Load Index (PLI)</strong> = (CF₁ × CF₂ × … × CFₙ)^(1/n)<br/>
+      <strong>Ecological Risk Factor (Eᵣ)</strong> = Tᵣ × CF &nbsp;|&nbsp; <strong>Risk Index (RI)</strong> = Σ Eᵣ
+    </div>
+
+    <div class="tip"><b>Tip:</b> Values in mg/kg (dry weight). Background values (Bₙ) are pre-filled with average shale composition. Edit if you have site-specific backgrounds.</div>
+
+    <div id="soil-inputs-wrap"></div>
+    <div>
+      <button class="calc-btn" onclick="calcSoil()">Calculate Indices</button>
+      <button class="reset-btn" onclick="resetSoil()">Reset</button>
+    </div>
+
+    <div id="soil-results" class="hidden">
+      <div class="divider"></div>
+      <div class="section-label">Results</div>
+      <div class="results-grid" id="soil-result-cards"></div>
+      <div class="chart-wrap" style="margin-top:1rem;">
+        <canvas id="soil-chart"></canvas>
+      </div>
+      <div id="soil-detail-table" style="margin-top:1rem; overflow-x:auto;"></div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ── REFERENCE ────────────────────────────────────────── -->
+<section id="reference" class="ref-section">
+<div class="container">
+  <div class="section-label">Classification Tables</div>
+  <div class="section-title">Pollution Level Reference</div>
+  <div class="section-sub">Internationally accepted thresholds used in environmental assessment.</div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchRefTab('hpi-ref')">HPI</button>
+    <button class="tab" onclick="switchRefTab('npi-ref')">Nemerow</button>
+    <button class="tab" onclick="switchRefTab('igeo-ref')">Igeo</button>
+    <button class="tab" onclick="switchRefTab('cf-ref')">CF</button>
+    <button class="tab" onclick="switchRefTab('ri-ref')">RI / Eᵣ</button>
+  </div>
+
+  <div id="hpi-ref" class="tab-panel active">
+    <table>
+      <thead><tr><th>HPI Value</th><th>Quality Class</th><th>Action Required</th></tr></thead>
+      <tbody>
+        <tr><td><span class="dot" style="background:var(--green)"></span>&lt; 10</td><td>Excellent / Uncontaminated</td><td>No action needed</td></tr>
+        <tr><td><span class="dot" style="background:#84CC16"></span>10 – 25</td><td>Good</td><td>Routine monitoring</td></tr>
+        <tr><td><span class="dot" style="background:var(--amber)"></span>25 – 50</td><td>Moderate</td><td>Caution; investigate sources</td></tr>
+        <tr><td><span class="dot" style="background:#F97316"></span>50 – 100</td><td>Poor</td><td>Treatment recommended</td></tr>
+        <tr><td><span class="dot" style="background:var(--red)"></span>&gt; 100</td><td>Very Poor / Critical</td><td>Immediate remediation</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Critical threshold for HPI is 100, beyond which water is unfit for drinking (based on Mohan et al., 1996).</p>
+  </div>
+
+  <div id="npi-ref" class="tab-panel">
+    <table>
+      <thead><tr><th>NPI Value</th><th>Pollution Level</th><th>Description</th></tr></thead>
+      <tbody>
+        <tr><td><span class="dot" style="background:var(--green)"></span>≤ 0.7</td><td>Not Polluted</td><td>All metals within permissible limits</td></tr>
+        <tr><td><span class="dot" style="background:var(--amber)"></span>0.7 – 1.0</td><td>Warning Level</td><td>Approaching permissible limits</td></tr>
+        <tr><td><span class="dot" style="background:#F97316"></span>1.0 – 2.0</td><td>Lightly Polluted</td><td>One or more metals exceed standards</td></tr>
+        <tr><td><span class="dot" style="background:#DC2626"></span>2.0 – 3.0</td><td>Moderately Polluted</td><td>Notable contamination detected</td></tr>
+        <tr><td><span class="dot" style="background:var(--red)"></span>&gt; 3.0</td><td>Heavily Polluted</td><td>Severe contamination; urgent action</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div id="igeo-ref" class="tab-panel">
+    <table>
+      <thead><tr><th>Igeo Value</th><th>Class</th><th>Pollution Level</th></tr></thead>
+      <tbody>
+        <tr><td><span class="dot" style="background:var(--green)"></span>≤ 0</td><td>0</td><td>Practically Uncontaminated</td></tr>
+        <tr><td><span class="dot" style="background:#84CC16"></span>0 – 1</td><td>1</td><td>Uncontaminated to Moderately Contaminated</td></tr>
+        <tr><td><span class="dot" style="background:var(--amber)"></span>1 – 2</td><td>2</td><td>Moderately Contaminated</td></tr>
+        <tr><td><span class="dot" style="background:#F59E0B"></span>2 – 3</td><td>3</td><td>Moderately to Heavily Contaminated</td></tr>
+        <tr><td><span class="dot" style="background:#F97316"></span>3 – 4</td><td>4</td><td>Heavily Contaminated</td></tr>
+        <tr><td><span class="dot" style="background:#DC2626"></span>4 – 5</td><td>5</td><td>Heavily to Extremely Contaminated</td></tr>
+        <tr><td><span class="dot" style="background:var(--red)"></span>&gt; 5</td><td>6</td><td>Extremely Contaminated</td></tr>
+      </tbody>
+    </table>
+    <p class="note">After Müller (1969). Factor 1.5 in denominator accounts for natural fluctuations in background values.</p>
+  </div>
+
+  <div id="cf-ref" class="tab-panel">
+    <table>
+      <thead><tr><th>CF Value</th><th>Contamination Level</th></tr></thead>
+      <tbody>
+        <tr><td><span class="dot" style="background:var(--green)"></span>&lt; 1</td><td>Low Contamination</td></tr>
+        <tr><td><span class="dot" style="background:var(--amber)"></span>1 – 3</td><td>Moderate Contamination</td></tr>
+        <tr><td><span class="dot" style="background:#F97316"></span>3 – 6</td><td>Considerable Contamination</td></tr>
+        <tr><td><span class="dot" style="background:var(--red)"></span>≥ 6</td><td>Very High Contamination</td></tr>
+      </tbody>
+    </table>
+    <p class="note">PLI &lt; 1 = no contamination; PLI = 1 = baseline; PLI &gt; 1 = progressive deterioration.</p>
+  </div>
+
+  <div id="ri-ref" class="tab-panel">
+    <table>
+      <thead><tr><th>Eᵣ (Single Metal)</th><th>RI (All Metals)</th><th>Ecological Risk</th></tr></thead>
+      <tbody>
+        <tr><td><span class="dot" style="background:var(--green)"></span>&lt; 40</td><td>&lt; 150</td><td>Low Risk</td></tr>
+        <tr><td><span class="dot" style="background:var(--amber)"></span>40 – 80</td><td>150 – 300</td><td>Moderate Risk</td></tr>
+        <tr><td><span class="dot" style="background:#F97316"></span>80 – 160</td><td>300 – 600</td><td>Considerable Risk</td></tr>
+        <tr><td><span class="dot" style="background:var(--red)"></span>≥ 160</td><td>≥ 600</td><td>Very High Risk</td></tr>
+      </tbody>
+    </table>
+    <p class="note">Based on Hakanson (1980). Toxicity response factors: Hg=40, Cd=30, As=10, Ni=Cu=Pb=5, Cr=2, Zn=Mn=Fe=1.</p>
+  </div>
+</div>
+</section>
+
+<!-- ── METALS INFO ───────────────────────────────────────── -->
+<section id="metals">
+<div class="container">
+  <div class="section-label">Metal Reference</div>
+  <div class="section-title">Heavy Metals &amp; Their Risks</div>
+  <div class="section-sub">Common heavy metals monitored in environmental samples and their health/ecological significance.</div>
+  <div class="info-grid">
+    <div class="info-card"><h4>⚫ Lead (Pb)</h4><p>Highly toxic neurotoxin. Bioaccumulates. WHO limit 0.01 mg/L in water. Affects brain development in children.</p></div>
+    <div class="info-card"><h4>🟡 Cadmium (Cd)</h4><p>Carcinogenic. Accumulates in kidneys. WHO limit 0.003 mg/L. Sources: fertilizers, batteries, smelting.</p></div>
+    <div class="info-card"><h4>🔴 Arsenic (As)</h4><p>Group 1 carcinogen. WHO limit 0.01 mg/L. Causes skin lesions, cancer. Naturally high in groundwater in many regions.</p></div>
+    <div class="info-card"><h4>⚪ Mercury (Hg)</h4><p>Potent neurotoxin. WHO limit 0.001 mg/L. Biomagnifies through food chain. Methylmercury is most toxic form.</p></div>
+    <div class="info-card"><h4>🔵 Chromium (Cr)</h4><p>Cr(VI) is carcinogenic. WHO limit 0.05 mg/L. Sources: leather tanning, electroplating, cement manufacturing.</p></div>
+    <div class="info-card"><h4>🟤 Copper (Cu)</h4><p>Essential micronutrient at low doses, toxic at high levels. WHO limit 2.0 mg/L. Sources: mining, agriculture.</p></div>
+    <div class="info-card"><h4>🟠 Iron (Fe)</h4><p>Most abundant heavy metal in earth's crust. Causes organoleptic issues. BIS limit 0.3 mg/L. Stains fixtures.</p></div>
+    <div class="info-card"><h4>⚗ Manganese (Mn)</h4><p>Neurological effects at high doses. WHO limit 0.1 mg/L. Co-occurs with Fe in anaerobic groundwater.</p></div>
+    <div class="info-card"><h4>🔩 Nickel (Ni)</h4><p>Allergenic and potentially carcinogenic. WHO limit 0.02 mg/L. Sources: alloy manufacturing, nickel plating.</p></div>
+    <div class="info-card"><h4>⬜ Zinc (Zn)</h4><p>Essential nutrient; toxic in excess. WHO limit 3.0 mg/L in water. Sources: galvanizing, mining runoff.</p></div>
+  </div>
+</div>
+</section>
+
+<!-- ── ABOUT ─────────────────────────────────────────────── -->
+<section id="about" style="background:var(--navy2); border-top:1px solid var(--border)">
+<div class="container">
+  <div class="about-wrap">
+    <div>
+      <div class="section-label">About This Project</div>
+      <div class="section-title">SIH 2025 – Statement 25067</div>
+      <p style="color:var(--muted); font-size:.88rem; margin-top:.5rem; line-height:1.8">
+        This application addresses the Smart India Hackathon 2025 problem statement on designing and developing a tool for computing Heavy Metal Pollution Indices for environmental assessment.
+      </p>
+      <p style="color:var(--muted); font-size:.88rem; margin-top:.75rem; line-height:1.8">
+        Heavy metal pollution poses serious threats to human health and ecosystems. Indices like HPI, Igeo, and RI provide standardised, quantifiable measures used by researchers, regulatory bodies, and environmental agencies worldwide.
+      </p>
+    </div>
+    <div>
+      <div class="section-label">Indices Implemented</div>
+      <div style="display:flex; flex-direction:column; gap:.5rem; margin-top:.5rem;">
+        <div style="display:flex; align-items:center; gap:.75rem; padding:.6rem .9rem; background:var(--card); border:1px solid var(--border); border-radius:6px;">
+          <span style="color:var(--teal); font-family:var(--font-m); font-size:.75rem; min-width:40px">HPI</span>
+          <span style="font-size:.8rem; color:var(--muted)">Heavy Metal Pollution Index (Mohan et al., 1996)</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:.75rem; padding:.6rem .9rem; background:var(--card); border:1px solid var(--border); border-radius:6px;">
+          <span style="color:var(--teal); font-family:var(--font-m); font-size:.75rem; min-width:40px">NPI</span>
+          <span style="font-size:.8rem; color:var(--muted)">Nemerow Pollution Index (Nemerow, 1974)</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:.75rem; padding:.6rem .9rem; background:var(--card); border:1px solid var(--border); border-radius:6px;">
+          <span style="color:var(--teal); font-family:var(--font-m); font-size:.75rem; min-width:40px">Igeo</span>
+          <span style="font-size:.8rem; color:var(--muted)">Geoaccumulation Index (Müller, 1969)</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:.75rem; padding:.6rem .9rem; background:var(--card); border:1px solid var(--border); border-radius:6px;">
+          <span style="color:var(--teal); font-family:var(--font-m); font-size:.75rem; min-width:40px">CF/PLI</span>
+          <span style="font-size:.8rem; color:var(--muted)">Contamination Factor &amp; Pollution Load Index (Tomlinson, 1980)</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:.75rem; padding:.6rem .9rem; background:var(--card); border:1px solid var(--border); border-radius:6px;">
+          <span style="color:var(--teal); font-family:var(--font-m); font-size:.75rem; min-width:40px">RI/Eᵣ</span>
+          <span style="font-size:.8rem; color:var(--muted)">Ecological Risk Index (Hakanson, 1980)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ── FOOTER ──────────────────────────────────────────────── -->
+<footer>
+  <span>HMPIx</span> — Heavy Metal Pollution Indices Calculator &nbsp;|&nbsp;
+  SIH 2025 Problem Statement <span>25067</span> &nbsp;|&nbsp;
+  Built for environmental assessment research
+</footer>
+
+<!-- ── JAVASCRIPT ─────────────────────────────────────────── -->
+<script>
+// ─── DATA ──────────────────────────────────────────────────
+const METALS_WATER = [
+  { id:'as', name:'Arsenic', sym:'As', std:0.01,  ideal:0,    unit:'mg/L' },
+  { id:'cd', name:'Cadmium', sym:'Cd', std:0.003, ideal:0,    unit:'mg/L' },
+  { id:'cr', name:'Chromium',sym:'Cr', std:0.05,  ideal:0,    unit:'mg/L' },
+  { id:'cu', name:'Copper',  sym:'Cu', std:2.0,   ideal:0.05, unit:'mg/L' },
+  { id:'fe', name:'Iron',    sym:'Fe', std:0.3,   ideal:0.1,  unit:'mg/L' },
+  { id:'pb', name:'Lead',    sym:'Pb', std:0.01,  ideal:0,    unit:'mg/L' },
+  { id:'mn', name:'Manganese',sym:'Mn',std:0.1,   ideal:0.05, unit:'mg/L' },
+  { id:'ni', name:'Nickel',  sym:'Ni', std:0.02,  ideal:0,    unit:'mg/L' },
+  { id:'zn', name:'Zinc',    sym:'Zn', std:3.0,   ideal:0.1,  unit:'mg/L' },
+  { id:'hg', name:'Mercury', sym:'Hg', std:0.001, ideal:0,    unit:'mg/L' },
+];
+
+const METALS_SOIL = [
+  { id:'as_s', name:'Arsenic', sym:'As', bg:13,    tr:10, unit:'mg/kg' },
+  { id:'cd_s', name:'Cadmium', sym:'Cd', bg:0.3,   tr:30, unit:'mg/kg' },
+  { id:'cr_s', name:'Chromium',sym:'Cr', bg:90,    tr:2,  unit:'mg/kg' },
+  { id:'cu_s', name:'Copper',  sym:'Cu', bg:45,    tr:5,  unit:'mg/kg' },
+  { id:'fe_s', name:'Iron',    sym:'Fe', bg:47200, tr:1,  unit:'mg/kg' },
+  { id:'pb_s', name:'Lead',    sym:'Pb', bg:20,    tr:5,  unit:'mg/kg' },
+  { id:'mn_s', name:'Manganese',sym:'Mn',bg:850,   tr:1,  unit:'mg/kg' },
+  { id:'ni_s', name:'Nickel',  sym:'Ni', bg:68,    tr:5,  unit:'mg/kg' },
+  { id:'zn_s', name:'Zinc',    sym:'Zn', bg:95,    tr:1,  unit:'mg/kg' },
+  { id:'hg_s', name:'Mercury', sym:'Hg', bg:0.4,   tr:40, unit:'mg/kg' },
+];
+
+// ─── TAB SWITCHING ─────────────────────────────────────────
+function switchTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tabs .tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+function switchRefTab(id) {
+  const parent = event.target.closest('section');
+  parent.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  parent.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  parent.querySelector('#'+id).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ─── BUILD WATER INPUTS ──────────────────────────────────
+function buildWaterInputs() {
+  const grid = document.getElementById('water-inputs');
+  grid.innerHTML = METALS_WATER.map(m => `
+    <div class="metal-row">
+      <label>${m.name} (${m.sym}) <span class="std">Std: ${m.std}</span></label>
+      <input type="number" id="w_${m.id}" placeholder="Enter value" step="any" min="0" />
+      <div class="unit">${m.unit} — WHO/BIS limit: ${m.std}</div>
+    </div>`).join('');
+}
+
+// ─── BUILD SOIL INPUTS ───────────────────────────────────
+function buildSoilInputs() {
+  const wrap = document.getElementById('soil-inputs-wrap');
+  wrap.innerHTML = `
+    <div style="margin-bottom:.75rem;">
+      <label style="font-size:.8rem; color:var(--muted); font-family:var(--font-h); font-weight:500; display:block; margin-bottom:.25rem;">
+        🔬 Measured concentration (Cₙ) in mg/kg
+      </label>
+    </div>
+    <div class="metal-grid" id="soil-meas-grid">
+      ${METALS_SOIL.map(m => `
+        <div class="metal-row">
+          <label>${m.name} (${m.sym}) <span class="std">Bg: ${m.bg}</span></label>
+          <input type="number" id="s_c_${m.id}" placeholder="Measured Cₙ" step="any" min="0" />
+          <input type="number" id="s_b_${m.id}" value="${m.bg}" placeholder="Background Bₙ" step="any" min="0" style="margin-top:.3rem; border-color: rgba(0,175,204,.3);" />
+          <div class="unit">${m.unit} — Background (editable)</div>
+        </div>`).join('')}
+    </div>`;
+}
+
+// ─── WATER CALCULATION ────────────────────────────────────
+let waterChartInst = null;
+function calcWater() {
+  const metals = [];
+  for (const m of METALS_WATER) {
+    const v = parseFloat(document.getElementById('w_'+m.id).value);
+    if (!isNaN(v) && v >= 0) metals.push({ ...m, val: v });
+  }
+  if (metals.length === 0) { alert('Please enter at least one metal concentration.'); return; }
+
+  // Single-factor pollution index Pi
+  metals.forEach(m => m.Pi = m.val / m.std);
+
+  // HPI
+  const Wi = metals.map(m => 1 / m.std);
+  const Qi = metals.map(m => Math.max(0, 100 * (m.val - m.ideal) / (m.std - m.ideal)));
+  const hpi = Wi.reduce((a,w,i) => a + w*Qi[i], 0) / Wi.reduce((a,w) => a+w, 0);
+
+  // Nemerow
+  const Pave = metals.reduce((a,m) => a + m.Pi, 0) / metals.length;
+  const Pmax = Math.max(...metals.map(m => m.Pi));
+  const npi  = Math.sqrt((Pave*Pave + Pmax*Pmax) / 2);
+
+  // Gauge update
+  const norm = Math.min(hpi / 300, 1);
+  const ARC_LEN = 251;
+  const offset = ARC_LEN * (1 - norm);
+  const gaugePath = document.getElementById('gauge-path');
+  const gaugeVal  = document.getElementById('gauge-val');
+  gaugePath.style.strokeDashoffset = offset;
+  gaugePath.style.stroke = hpiColor(hpi);
+  gaugeVal.textContent = hpi.toFixed(1);
+
+  // Cards
+  const cardsEl = document.getElementById('water-result-cards');
+  cardsEl.innerHTML = `
+    ${resultCard('Heavy Metal Pollution Index', hpi.toFixed(2), hpiLevel(hpi), hpiLabel(hpi))}
+    ${resultCard('Nemerow Pollution Index', npi.toFixed(3), npiLevel(npi), npiLabel(npi))}
+    ${resultCard('Metals Analysed', metals.length, '', '')}
+    ${resultCard('Worst Single Metal', metals.reduce((a,m) => m.Pi>a.Pi?m:a, metals[0]).name + ' (' + metals.reduce((a,m) => m.Pi>a.Pi?m:a, metals[0]).sym + ')', npiLevel(Math.max(...metals.map(m=>m.Pi))), 'P = '+Math.max(...metals.map(m=>m.Pi)).toFixed(3))}`;
+
+  // Detail table
+  const tbl = document.getElementById('water-detail-table');
+  tbl.innerHTML = `<table>
+    <thead><tr><th>Metal</th><th>Measured (mg/L)</th><th>Standard (mg/L)</th><th>Pi (Ci/Si)</th><th>Qi</th><th>Wi</th><th>Status</th></tr></thead>
+    <tbody>
+      ${metals.map((m,i) => `
+        <tr>
+          <td><b>${m.name}</b> (${m.sym})</td>
+          <td style="font-family:var(--font-m)">${m.val}</td>
+          <td style="font-family:var(--font-m)">${m.std}</td>
+          <td style="font-family:var(--font-m); color:${m.Pi>1?'var(--red)':'var(--green)'}">${m.Pi.toFixed(3)}</td>
+          <td style="font-family:var(--font-m)">${Qi[i].toFixed(2)}</td>
+          <td style="font-family:var(--font-m)">${Wi[i].toFixed(4)}</td>
+          <td><span style="color:${m.Pi>1?'var(--red)':'var(--green)'}; font-weight:600; font-size:.78rem">${m.Pi>1?'▲ Exceeds':'✓ Within'}</span></td>
+        </tr>`).join('')}
+    </tbody>
+  </table>`;
+
+  // Chart
+  if (waterChartInst) waterChartInst.destroy();
+  const ctx = document.getElementById('water-chart').getContext('2d');
+  waterChartInst = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: metals.map(m => m.sym),
+      datasets: [
+        {
+          label: 'Pollution Index (Pi = Ci/Si)',
+          data: metals.map(m => m.Pi),
+          backgroundColor: metals.map(m => m.Pi > 1 ? 'rgba(239,68,68,.7)' : 'rgba(0,175,204,.7)'),
+          borderColor:     metals.map(m => m.Pi > 1 ? '#EF4444' : '#00AFCC'),
+          borderWidth: 1, borderRadius: 4,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#8BA3B8', font: { family: 'Inter' } } },
+        tooltip: { callbacks: { label: ctx => ` Pi = ${ctx.parsed.y.toFixed(3)}` } },
+      },
+      scales: {
+        x: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' } },
+        y: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' },
+          title: { display: true, text: 'Pi (Ci/Si)', color: '#8BA3B8' }
+        }
+      },
+      annotation: {
+        annotations: { line1: { type:'line', y:1, borderColor:'rgba(245,158,11,.5)', borderWidth:1 } }
+      }
+    }
+  });
+
+  document.getElementById('water-results').classList.remove('hidden');
+  document.getElementById('water-results').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ─── SOIL CALCULATION ─────────────────────────────────────
+let soilChartInst = null;
+function calcSoil() {
+  const metals = [];
+  for (const m of METALS_SOIL) {
+    const c = parseFloat(document.getElementById('s_c_'+m.id).value);
+    const b = parseFloat(document.getElementById('s_b_'+m.id).value);
+    if (!isNaN(c) && c >= 0 && !isNaN(b) && b > 0) {
+      const cf   = c / b;
+      const igeo = Math.log2(c / (1.5 * b));
+      const er   = m.tr * cf;
+      metals.push({ ...m, c, b, cf, igeo, er });
+    }
+  }
+  if (metals.length === 0) { alert('Please enter at least one measured concentration.'); return; }
+
+  const PLI = Math.pow(metals.reduce((a,m) => a * m.cf, 1), 1/metals.length);
+  const RI  = metals.reduce((a,m) => a + m.er, 0);
+
+  const cardsEl = document.getElementById('soil-result-cards');
+  cardsEl.innerHTML = `
+    ${resultCard('Pollution Load Index', PLI.toFixed(3), pliLevel(PLI), pliLabel(PLI))}
+    ${resultCard('Risk Index (RI)', RI.toFixed(2), riLevel(RI), riLabel(RI))}
+    ${resultCard('Metals Analysed', metals.length, '', '')}
+    ${resultCard('Highest Igeo Metal', metals.reduce((a,m) => m.igeo>a.igeo?m:a, metals[0]).name + ' (' + metals.reduce((a,m) => m.igeo>a.igeo?m:a, metals[0]).sym + ')', igeoLevel(Math.max(...metals.map(m=>m.igeo))), 'Igeo = '+Math.max(...metals.map(m=>m.igeo)).toFixed(2))}`;
+
+  // Detail table
+  const tbl = document.getElementById('soil-detail-table');
+  tbl.innerHTML = `<table>
+    <thead><tr><th>Metal</th><th>Measured</th><th>Background</th><th>CF</th><th>Igeo</th><th>Tr</th><th>Eᵣ</th><th>Igeo Class</th></tr></thead>
+    <tbody>
+      ${metals.map(m => `
+        <tr>
+          <td><b>${m.name}</b> (${m.sym})</td>
+          <td style="font-family:var(--font-m)">${m.c}</td>
+          <td style="font-family:var(--font-m)">${m.b}</td>
+          <td style="font-family:var(--font-m); color:${cfColor(m.cf)}">${m.cf.toFixed(3)}</td>
+          <td style="font-family:var(--font-m); color:${igeoColor(m.igeo)}">${m.igeo.toFixed(2)}</td>
+          <td style="font-family:var(--font-m)">${m.tr}</td>
+          <td style="font-family:var(--font-m); color:${erColor(m.er)}">${m.er.toFixed(2)}</td>
+          <td style="font-size:.78rem; font-weight:600; color:${igeoColor(m.igeo)}">${igeoClassLabel(m.igeo)}</td>
+        </tr>`).join('')}
+    </tbody>
+  </table>`;
+
+  // Chart — multi-dataset
+  if (soilChartInst) soilChartInst.destroy();
+  const ctx = document.getElementById('soil-chart').getContext('2d');
+  soilChartInst = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: metals.map(m => m.sym),
+      datasets: [
+        {
+          label: 'Contamination Factor (CF)',
+          data: metals.map(m => m.cf),
+          backgroundColor: 'rgba(0,175,204,.7)',
+          borderColor: '#00AFCC', borderWidth: 1, borderRadius: 4,
+        },
+        {
+          label: 'Igeo (×1 for scale)',
+          data: metals.map(m => Math.max(0, m.igeo)),
+          backgroundColor: 'rgba(245,158,11,.7)',
+          borderColor: '#F59E0B', borderWidth: 1, borderRadius: 4,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { labels: { color: '#8BA3B8', font: { family: 'Inter' } } },
+      },
+      scales: {
+        x: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' } },
+        y: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' },
+          title: { display: true, text: 'Index Value', color: '#8BA3B8' }
+        }
+      }
+    }
+  });
+
+  document.getElementById('soil-results').classList.remove('hidden');
+  document.getElementById('soil-results').scrollIntoView({ behavior:'smooth', block:'start' });
+}
+
+// ─── RESET ─────────────────────────────────────────────────
+function resetWater() {
+  document.getElementById('water-results').classList.add('hidden');
+  METALS_WATER.forEach(m => { const el = document.getElementById('w_'+m.id); if(el) el.value = ''; });
+}
+function resetSoil() {
+  document.getElementById('soil-results').classList.add('hidden');
+  METALS_SOIL.forEach(m => {
+    const c = document.getElementById('s_c_'+m.id); if(c) c.value = '';
+    const b = document.getElementById('s_b_'+m.id); if(b) b.value = m.bg;
+  });
+}
+
+// ─── HELPERS ───────────────────────────────────────────────
+function resultCard(label, val, levelClass, status) {
+  return `<div class="result-card ${levelClass}">
+    <h4>${label}</h4>
+    <div class="result-value">${val}</div>
+    ${status ? `<div class="result-status">${status}</div>` : ''}
+  </div>`;
+}
+
+function hpiColor(h)  { return h<10?'var(--green)':h<25?'#84CC16':h<50?'var(--amber)':h<100?'#F97316':'var(--red)'; }
+function hpiLevel(h)  { return h<10?'level-low':h<50?'level-med':h<100?'level-high':'level-crit'; }
+function hpiLabel(h)  { return h<10?'✓ Excellent':h<25?'✓ Good':h<50?'⚠ Moderate':h<100?'⚠ Poor':'✗ Critical — Unfit'; }
+
+function npiLevel(n)  { return n<0.7?'level-low':n<1?'level-med':n<2?'level-high':'level-crit'; }
+function npiLabel(n)  { return n<0.7?'✓ Not Polluted':n<1?'⚠ Warning Level':n<2?'⚠ Lightly Polluted':n<3?'✗ Moderately Polluted':'✗ Heavily Polluted'; }
+
+function pliLevel(p)  { return p<1?'level-low':p<2?'level-med':p<3?'level-high':'level-crit'; }
+function pliLabel(p)  { return p<1?'✓ No Contamination':p<2?'⚠ Progressive Deterioration':p<3?'⚠ Considerable':'✗ Severely Polluted'; }
+
+function riLevel(r)   { return r<150?'level-low':r<300?'level-med':r<600?'level-high':'level-crit'; }
+function riLabel(r)   { return r<150?'✓ Low Risk':r<300?'⚠ Moderate Risk':r<600?'⚠ Considerable Risk':'✗ Very High Risk'; }
+
+function cfColor(c)   { return c<1?'var(--green)':c<3?'var(--amber)':c<6?'#F97316':'var(--red)'; }
+function igeoColor(v) { return v<=0?'var(--green)':v<=1?'#84CC16':v<=2?'var(--amber)':v<=3?'#F59E0B':v<=4?'#F97316':'var(--red)'; }
+function erColor(e)   { return e<40?'var(--green)':e<80?'var(--amber)':e<160?'#F97316':'var(--red)'; }
+function igeoLevel(v) { return v<=0?'level-low':v<=2?'level-med':v<=4?'level-high':'level-crit'; }
+function igeoClassLabel(v) {
+  if (v<=0) return 'Class 0 – Clean';
+  if (v<=1) return 'Class 1 – Uncontaminated to Moderate';
+  if (v<=2) return 'Class 2 – Moderate';
+  if (v<=3) return 'Class 3 – Mod–Heavy';
+  if (v<=4) return 'Class 4 – Heavy';
+  if (v<=5) return 'Class 5 – Heavy–Extreme';
+  return 'Class 6 – Extreme';
+}
+
+// ─── INIT ──────────────────────────────────────────────────
+buildWaterInputs();
+buildSoilInputs();
+</script>
+</body>
+</html>
