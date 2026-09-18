@@ -734,7 +734,7 @@ function calcWater() {
     </tbody>
   </table>`;
 
-  // Chart
+  // Chart in the basics
   if (waterChartInst) waterChartInst.destroy();
   const ctx = document.getElementById('water-chart').getContext('2d');
   waterChartInst = new Chart(ctx, {
