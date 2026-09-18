@@ -325,6 +325,8 @@
   </div>
   <div class="nav-links">
     <a href="#calculator">Calculator</a>
+    <a href="#dataset">Dataset</a>
+    <span id="api-status" style="font-family:var(--font-m); font-size:.72rem; color:var(--muted)">● API: checking…</span>
     <a href="#reference">Reference</a>
     <a href="#metals">Metals</a>
     <a href="#about">About</a>
@@ -444,6 +446,27 @@
 </section>
 
 <!-- ── REFERENCE ────────────────────────────────────────── -->
+<!-- ── DATASET UPLOAD (Flask /api/upload) ───────────────── -->
+<section id="dataset">
+<div class="container">
+  <div class="section-label">Backend · Flask API</div>
+  <div class="section-title">Dataset Upload &amp; Batch Analysis</div>
+  <div class="section-sub">Upload a CSV of water samples. The file is sent to the Flask backend (<code>POST /api/upload</code>), which computes HPI, NPI and class for every row using <code>backend/hpi.py</code>.</div>
+  <div class="tip"><b>CSV columns:</b> location, latitude, longitude, sample_date, as, cd, cr, cu, fe, pb, mn, ni, zn, hg (mg/L). Blank cells are skipped.</div>
+  <div style="display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin:1rem 0;">
+    <input type="file" id="csv-file" accept=".csv" style="color:var(--muted)" />
+    <button class="calc-btn" onclick="uploadCsv()">Upload &amp; Analyse</button>
+    <button class="reset-btn" onclick="uploadSample()">Use sample dataset</button>
+  </div>
+  <div id="upload-msg" style="color:var(--muted); font-size:.85rem;"></div>
+  <div id="upload-results" class="hidden">
+    <div class="results-grid" id="upload-cards"></div>
+    <div class="chart-wrap" style="margin-top:1rem;"><canvas id="upload-chart"></canvas></div>
+    <div id="upload-table" style="margin-top:1rem; overflow-x:auto;"></div>
+  </div>
+</div>
+</section>
+
 <section id="reference" class="ref-section">
 <div class="container">
   <div class="section-label">Classification Tables</div>
@@ -629,6 +652,85 @@ const METALS_SOIL = [
   { id:'hg_s', name:'Mercury', sym:'Hg', bg:0.4,   tr:40, unit:'mg/kg' },
 ];
 
+// ─── BACKEND API ───────────────────────────────────────────
+// Served by Flask -> same origin; opened as a local file -> talk to the local Flask server
+const API = location.protocol === 'file:' ? 'http://127.0.0.1:5000' : '';
+const HPI_HEX = h => h<10?'#22C55E':h<25?'#84CC16':h<50?'#F59E0B':h<100?'#F97316':'#EF4444';
+
+async function checkApi() {
+  const el = document.getElementById('api-status');
+  try {
+    const ok = (await fetch(API + '/api/health')).ok;
+    el.textContent = ok ? '● API: online' : '● API: error';
+    el.style.color = ok ? 'var(--green)' : 'var(--red)';
+  } catch (e) {
+    el.textContent = '● API: offline'; el.style.color = 'var(--red)';
+  }
+}
+
+let uploadChartInst = null;
+async function sendCsv(file) {
+  const msg = document.getElementById('upload-msg');
+  msg.textContent = 'Uploading ' + file.name + '…';
+  const fd = new FormData(); fd.append('file', file);
+  let d;
+  try {
+    const r = await fetch(API + '/api/upload', { method: 'POST', body: fd });
+    d = await r.json();
+    if (!r.ok) { msg.textContent = '✗ ' + d.error; return; }
+  } catch (e) {
+    msg.textContent = '✗ Backend not reachable. Run: python backend/app.py'; return;
+  }
+  const rows = d.results;
+  if (!rows.length) { msg.textContent = '✗ No valid rows in ' + file.name; return; }
+  msg.textContent = `✓ ${file.name}: ${d.count} rows analysed by the Flask API` + (d.errors.length ? `, ${d.errors.length} rows skipped` : '');
+  const worst = rows.reduce((a, r) => r.hpi > a.hpi ? r : a, rows[0]);
+  const avg = rows.reduce((a, r) => a + r.hpi, 0) / rows.length;
+  const unsafe = rows.filter(r => r.hpi >= 100).length;
+  document.getElementById('upload-cards').innerHTML = `
+    ${resultCard('Samples Analysed', rows.length, '', '')}
+    ${resultCard('Average HPI', avg.toFixed(2), hpiLevel(avg), hpiLabel(avg))}
+    ${resultCard('Worst Site', worst.location || 'Row ' + worst.row, hpiLevel(worst.hpi), 'HPI = ' + worst.hpi)}
+    ${resultCard('Above Limit (HPI ≥ 100)', unsafe + ' / ' + rows.length, unsafe ? 'level-crit' : 'level-low', unsafe ? '✗ Unfit for drinking' : '✓ All within limit')}`;
+  document.getElementById('upload-table').innerHTML = `<table>
+    <thead><tr><th>#</th><th>Location</th><th>HPI</th><th>NPI</th><th>Class</th></tr></thead>
+    <tbody>${rows.map(r => `<tr>
+      <td>${r.row}</td><td><b>${r.location || '—'}</b></td>
+      <td style="font-family:var(--font-m); color:${HPI_HEX(r.hpi)}">${r.hpi}</td>
+      <td style="font-family:var(--font-m)">${r.npi}</td>
+      <td style="color:${HPI_HEX(r.hpi)}; font-weight:600">${r.hpi_class}</td></tr>`).join('')}
+    ${d.errors.map(e => `<tr><td>${e.row}</td><td colspan="4" style="color:var(--red)">${e.error}</td></tr>`).join('')}
+    </tbody></table>`;
+  if (uploadChartInst) uploadChartInst.destroy();
+  uploadChartInst = new Chart(document.getElementById('upload-chart').getContext('2d'), {
+    type: 'bar',
+    data: { labels: rows.map(r => r.location || 'Row ' + r.row),
+      datasets: [{ label: 'HPI per site (100 = permissible limit)', data: rows.map(r => r.hpi),
+        backgroundColor: rows.map(r => HPI_HEX(r.hpi)), borderRadius: 4 }] },
+    options: { responsive: true,
+      plugins: { legend: { labels: { color: '#8BA3B8' } } },
+      scales: { x: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' } },
+                y: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' }, title: { display: true, text: 'HPI', color: '#8BA3B8' } } } }
+  });
+  document.getElementById('upload-results').classList.remove('hidden');
+}
+
+function uploadCsv() {
+  const f = document.getElementById('csv-file').files[0];
+  if (!f) { alert('Choose a .csv file first.'); return; }
+  sendCsv(f);
+}
+
+async function uploadSample() {
+  try {
+    const r = await fetch(API + '/data/sample_water_samples.csv');
+    if (!r.ok) throw new Error();
+    sendCsv(new File([await r.text()], 'sample_water_samples.csv', { type: 'text/csv' }));
+  } catch (e) {
+    document.getElementById('upload-msg').textContent = '✗ Backend not reachable. Run: python backend/app.py';
+  }
+}
+
 // ─── TAB SWITCHING ─────────────────────────────────────────
 function switchTab(id) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -677,7 +779,7 @@ function buildSoilInputs() {
 
 // ─── WATER CALCULATION ────────────────────────────────────
 let waterChartInst = null;
-function calcWater() {
+async function calcWater() {
   const metals = [];
   for (const m of METALS_WATER) {
     const v = parseFloat(document.getElementById('w_'+m.id).value);
@@ -691,12 +793,22 @@ function calcWater() {
   // HPI
   const Wi = metals.map(m => 1 / m.std);
   const Qi = metals.map(m => Math.max(0, 100 * (m.val - m.ideal) / (m.std - m.ideal)));
-  const hpi = Wi.reduce((a,w,i) => a + w*Qi[i], 0) / Wi.reduce((a,w) => a+w, 0);
+  let hpi = Wi.reduce((a,w,i) => a + w*Qi[i], 0) / Wi.reduce((a,w) => a+w, 0);
 
   // Nemerow
   const Pave = metals.reduce((a,m) => a + m.Pi, 0) / metals.length;
   const Pmax = Math.max(...metals.map(m => m.Pi));
-  const npi  = Math.sqrt((Pave*Pave + Pmax*Pmax) / 2);
+  let npi  = Math.sqrt((Pave*Pave + Pmax*Pmax) / 2);
+
+  // Official values come from the Flask backend (backend/hpi.py); browser maths is the offline fallback
+  let source = 'Browser (API offline)';
+  try {
+    const r = await fetch(API + '/api/calculate', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(Object.fromEntries(metals.map(m => [m.id, m.val]))),
+    });
+    if (r.ok) { const d = await r.json(); hpi = d.hpi; npi = d.npi; source = 'Flask API'; }
+  } catch (e) {}
 
   // Gauge update
   const norm = Math.min(hpi / 300, 1);
@@ -714,6 +826,7 @@ function calcWater() {
     ${resultCard('Heavy Metal Pollution Index', hpi.toFixed(2), hpiLevel(hpi), hpiLabel(hpi))}
     ${resultCard('Nemerow Pollution Index', npi.toFixed(3), npiLevel(npi), npiLabel(npi))}
     ${resultCard('Metals Analysed', metals.length, '', '')}
+    ${resultCard('Computed By', source, source === 'Flask API' ? 'level-low' : 'level-med', source === 'Flask API' ? 'POST /api/calculate' : 'start: python backend/app.py')}
     ${resultCard('Worst Single Metal', metals.reduce((a,m) => m.Pi>a.Pi?m:a, metals[0]).name + ' (' + metals.reduce((a,m) => m.Pi>a.Pi?m:a, metals[0]).sym + ')', npiLevel(Math.max(...metals.map(m=>m.Pi))), 'P = '+Math.max(...metals.map(m=>m.Pi)).toFixed(3))}`;
 
   // Detail table
@@ -910,6 +1023,7 @@ function igeoClassLabel(v) {
 // ─── INIT ──────────────────────────────────────────────────
 buildWaterInputs();
 buildSoilInputs();
+checkApi();
 </script>
 </body>
 </html>
