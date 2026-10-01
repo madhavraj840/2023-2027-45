@@ -305,6 +305,18 @@
     cursor: pointer; transition: all .2s; margin-top: .5rem; margin-left: .5rem;
   }
   .reset-btn:hover { color: var(--white); border-color: var(--muted); }
+  /* ── HEATMAP ──────────────────────────────────────────── */
+  .heat{margin-top:1rem;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:1rem;overflow-x:auto}
+  .heat h3{font-family:var(--font-h);font-size:1rem}
+  .heat p{font-size:.78rem;color:var(--muted);margin:.2rem 0 .8rem}
+  .heat table{border-collapse:separate;border-spacing:3px;width:auto;min-width:100%}
+  .heat th{background:none;border:0;padding:.2rem .4rem;text-align:center;color:var(--muted);font-family:var(--font-m);font-size:.72rem}
+  .heat th.site,.heat td.site{text-align:left;font-weight:600;color:var(--white);white-space:nowrap;padding:.2rem .6rem .2rem 0}
+  .heat td.cell{text-align:center;font-family:var(--font-m);font-size:.75rem;color:#fff;border-radius:4px;padding:.45rem .5rem;min-width:52px}
+  .heat td.cell.na{background:var(--navy);color:var(--muted)}
+  .heat tbody tr:hover{background:none}
+  .legend{display:flex;gap:.9rem;flex-wrap:wrap;margin-top:.8rem;font-size:.75rem;color:var(--muted)}
+  .legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:5px;vertical-align:-2px}
   .hidden { display: none; }
   .divider { height: 1px; background: var(--border); margin: 2rem 0; }
   .note { font-size: .75rem; color: var(--muted); margin-top: .5rem; }
@@ -462,6 +474,7 @@
   <div id="upload-results" class="hidden">
     <div class="results-grid" id="upload-cards"></div>
     <div class="chart-wrap" style="margin-top:1rem;"><canvas id="upload-chart"></canvas></div>
+    <div class="heat" id="upload-heatmap"></div>
     <div id="upload-table" style="margin-top:1rem; overflow-x:auto;"></div>
   </div>
 </div>
@@ -712,7 +725,36 @@ async function sendCsv(file) {
       scales: { x: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' } },
                 y: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' }, title: { display: true, text: 'HPI', color: '#8BA3B8' } } } }
   });
+  renderHeatmap(await file.text());
   document.getElementById('upload-results').classList.remove('hidden');
+}
+
+// ─── HEATMAP: sites × metals, coloured by Pi = concentration / standard ─
+const HEAT = [['< 0.5','#1F5C4B'],['0.5 – 1','#4C9A5B'],['1 – 2','#C9A227'],['2 – 5','#E0742B'],['> 5','#C93A3A']];
+const heatColor = p => p<0.5?HEAT[0][1]:p<1?HEAT[1][1]:p<2?HEAT[2][1]:p<5?HEAT[3][1]:HEAT[4][1];
+
+function renderHeatmap(text) {
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  const head = lines[0].split(',').map(h => h.trim().toLowerCase());
+  const ci = Object.fromEntries(head.map((h, i) => [h, i]));
+  const cols = METALS_WATER.filter(m => m.id in ci);
+  const rows = lines.slice(1).map((l, n) => {
+    const c = l.split(',');
+    return { name: (c[ci.location] || '').trim() || 'Row ' + (n + 1),
+      vals: cols.map(m => { const v = parseFloat(c[ci[m.id]]); return isNaN(v) ? null : v; }) };
+  }).filter(r => r.vals.some(v => v !== null));
+  const box = document.getElementById('upload-heatmap');
+  if (!rows.length) { box.innerHTML = ''; return; }
+  box.innerHTML = `<h3>Contamination heatmap</h3>
+    <p>Each cell is concentration ÷ permissible standard (Pi). Above 1 means the metal exceeds its limit.</p>
+    <table><thead><tr><th class="site"></th>${cols.map(m => `<th>${m.sym}</th>`).join('')}</tr></thead><tbody>
+    ${rows.map(r => `<tr><td class="site">${r.name}</td>${r.vals.map((v, i) => {
+      if (v === null) return '<td class="cell na">–</td>';
+      const p = v / cols[i].std;
+      return `<td class="cell" style="background:${heatColor(p)}" title="${cols[i].name}: ${v} ${cols[i].unit}">${p.toFixed(2)}</td>`;
+    }).join('')}</tr>`).join('')}
+    </tbody></table>
+    <div class="legend">${HEAT.map(h => `<span><i style="background:${h[1]}"></i>${h[0]}</span>`).join('')}</div>`;
 }
 
 function uploadCsv() {
