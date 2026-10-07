@@ -1,0 +1,23 @@
+{
+  "METALS": [
+    "Zn",
+    "Cd",
+    "Pb",
+    "Cu",
+    "Ni",
+    "Mn",
+    "As",
+    "Cr"
+  ],
+  "CATS": [
+    "Site",
+    "Month"
+  ],
+  "TARGETS": [
+    "HPI",
+    "HEI",
+    "DC"
+  ],
+  "TEST_YEAR": 2022,
+  "RANDOM_STATE": 42
+}
