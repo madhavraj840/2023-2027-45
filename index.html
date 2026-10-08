@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Heavy metal Metal Pollution Indices | SIH 2025 – Statement 25067</title>
+<title>Heavy Metal Pollution Indices | SIH 2025 – Statement 25067</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
@@ -229,6 +229,11 @@
   }
   .chart-wrap canvas { max-height: 280px; }
 
+  /* chart rows (two charts side by side) */
+  .chart-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem;margin-top:1rem}
+  .chart-row .chart-wrap{margin-top:0}
+  .chart-title{font-family:var(--font-h);font-size:.9rem;margin-bottom:.5rem}
+
   /* ── FORMULA BOX ─────────────────────────────────────── */
   .formula-box {
     background: rgba(0,175,204,.05);
@@ -419,8 +424,9 @@
 
       <div class="results-grid" id="water-result-cards"></div>
 
-      <div class="chart-wrap" style="margin-top:1rem;">
-        <canvas id="water-chart"></canvas>
+      <div class="chart-row">
+        <div class="chart-wrap"><canvas id="water-chart"></canvas></div>
+        <div class="chart-wrap"><div class="chart-title">Share of each metal in HPI</div><canvas id="water-share-chart"></canvas></div>
       </div>
 
       <div id="water-detail-table" style="margin-top:1rem; overflow-x:auto;"></div>
@@ -448,8 +454,9 @@
       <div class="divider"></div>
       <div class="section-label">Results</div>
       <div class="results-grid" id="soil-result-cards"></div>
-      <div class="chart-wrap" style="margin-top:1rem;">
-        <canvas id="soil-chart"></canvas>
+      <div class="chart-row">
+        <div class="chart-wrap"><canvas id="soil-chart"></canvas></div>
+        <div class="chart-wrap"><canvas id="soil-er-chart"></canvas></div>
       </div>
       <div id="soil-detail-table" style="margin-top:1rem; overflow-x:auto;"></div>
     </div>
@@ -473,7 +480,10 @@
   <div id="upload-msg" style="color:var(--muted); font-size:.85rem;"></div>
   <div id="upload-results" class="hidden">
     <div class="results-grid" id="upload-cards"></div>
-    <div class="chart-wrap" style="margin-top:1rem;"><canvas id="upload-chart"></canvas></div>
+    <div class="chart-row">
+      <div class="chart-wrap"><canvas id="upload-chart"></canvas></div>
+      <div class="chart-wrap"><div class="chart-title">Samples by quality class</div><canvas id="upload-dist-chart"></canvas></div>
+    </div>
     <div class="heat" id="upload-heatmap"></div>
     <div id="upload-table" style="margin-top:1rem; overflow-x:auto;"></div>
   </div>
@@ -670,6 +680,29 @@ const METALS_SOIL = [
 const API = location.protocol === 'file:' ? 'http://127.0.0.1:5000' : '';
 const HPI_HEX = h => h<10?'#22C55E':h<25?'#84CC16':h<50?'#F59E0B':h<100?'#F97316':'#EF4444';
 
+// ─── CHART HELPERS ─────────────────────────────────────────
+let waterShareInst = null, soilErInst = null, uploadDistInst = null;
+const PALETTE = ['#00AFCC','#F59E0B','#EF4444','#22C55E','#8B5CF6','#EC4899','#84CC16','#F97316','#3B82F6','#14B8A6'];
+const erHex = e => e<40?'#22C55E':e<80?'#F59E0B':e<160?'#F97316':'#EF4444';
+
+// dependency-free replacement for chartjs-plugin-annotation
+const limitLines = lines => ({
+  id: 'limitLines',
+  afterDatasetsDraw(chart) {
+    const { ctx, chartArea: a, scales: { y } } = chart;
+    ctx.save(); ctx.setLineDash([6, 4]); ctx.lineWidth = 1.5;
+    ctx.font = '11px "Space Mono", monospace';
+    lines.forEach(l => {
+      const py = y.getPixelForValue(l.y);
+      if (py < a.top || py > a.bottom) return;
+      ctx.strokeStyle = ctx.fillStyle = l.color;
+      ctx.beginPath(); ctx.moveTo(a.left, py); ctx.lineTo(a.right, py); ctx.stroke();
+      ctx.fillText(l.label, a.right - ctx.measureText(l.label).width - 4, py - 4);
+    });
+    ctx.restore();
+  }
+});
+
 async function checkApi() {
   const el = document.getElementById('api-status');
   try {
@@ -697,6 +730,8 @@ async function sendCsv(file) {
   const rows = d.results;
   if (!rows.length) { msg.textContent = '✗ No valid rows in ' + file.name; return; }
   msg.textContent = `✓ ${file.name}: ${d.count} rows analysed by the Flask API` + (d.errors.length ? `, ${d.errors.length} rows skipped` : '');
+  // show the container first so charts are created in a visible element
+  document.getElementById('upload-results').classList.remove('hidden');
   const worst = rows.reduce((a, r) => r.hpi > a.hpi ? r : a, rows[0]);
   const avg = rows.reduce((a, r) => a + r.hpi, 0) / rows.length;
   const unsafe = rows.filter(r => r.hpi >= 100).length;
@@ -725,8 +760,20 @@ async function sendCsv(file) {
       scales: { x: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' } },
                 y: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' }, title: { display: true, text: 'HPI', color: '#8BA3B8' } } } }
   });
+
+  // Samples-by-quality-class distribution
+  const counts = {};
+  rows.forEach(r => { (counts[r.hpi_class] ||= { n: 0, hex: HPI_HEX(r.hpi) }).n++; });
+  if (uploadDistInst) uploadDistInst.destroy();
+  uploadDistInst = new Chart(document.getElementById('upload-dist-chart').getContext('2d'), {
+    type: 'doughnut',
+    data: { labels: Object.keys(counts),
+      datasets: [{ data: Object.values(counts).map(c => c.n),
+        backgroundColor: Object.values(counts).map(c => c.hex), borderColor: '#112236' }] },
+    options: { responsive: true, plugins: { legend: { position: 'right', labels: { color: '#8BA3B8' } } } }
+  });
+
   renderHeatmap(await file.text());
-  document.getElementById('upload-results').classList.remove('hidden');
 }
 
 // ─── HEATMAP: sites × metals, coloured by Pi = concentration / standard ─
@@ -889,7 +936,10 @@ async function calcWater() {
     </tbody>
   </table>`;
 
-  // Chart in the basics
+  // Show results first so the charts are created in a visible container
+  document.getElementById('water-results').classList.remove('hidden');
+
+  // Pi bar chart with a drawn Pi = 1 limit line
   if (waterChartInst) waterChartInst.destroy();
   const ctx = document.getElementById('water-chart').getContext('2d');
   waterChartInst = new Chart(ctx, {
@@ -914,17 +964,28 @@ async function calcWater() {
       },
       scales: {
         x: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' } },
-        y: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' },
+        y: { beginAtZero: true, suggestedMax: 1.2,
+          ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' },
           title: { display: true, text: 'Pi (Ci/Si)', color: '#8BA3B8' }
         }
-      },
-      annotation: {
-        annotations: { line1: { type:'line', y:1, borderColor:'rgba(245,158,11,.5)', borderWidth:1 } }
       }
-    }
+    },
+    plugins: [limitLines([{ y: 1, color: '#F59E0B', label: 'Limit (Pi = 1)' }])]
   });
 
-  document.getElementById('water-results').classList.remove('hidden');
+  // Contribution of each metal to the HPI numerator (Wi × Qi)
+  if (waterShareInst) waterShareInst.destroy();
+  const contrib = metals.map((m, i) => Wi[i] * Qi[i]);
+  const tot = contrib.reduce((a, b) => a + b, 0);
+  waterShareInst = new Chart(document.getElementById('water-share-chart').getContext('2d'), {
+    type: 'doughnut',
+    data: { labels: metals.map(m => m.sym),
+      datasets: [{ data: contrib, backgroundColor: metals.map((_, i) => PALETTE[i % PALETTE.length]), borderColor: '#112236' }] },
+    options: { responsive: true,
+      plugins: { legend: { position: 'right', labels: { color: '#8BA3B8' } },
+        tooltip: { callbacks: { label: c => ` ${c.label}: ${tot ? (c.parsed / tot * 100).toFixed(1) : 0}%` } } } }
+  });
+
   document.getElementById('water-results').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
@@ -973,7 +1034,10 @@ function calcSoil() {
     </tbody>
   </table>`;
 
-  // Chart — multi-dataset
+  // Show results first so the charts are created in a visible container
+  document.getElementById('soil-results').classList.remove('hidden');
+
+  // Chart — CF and Igeo (negative Igeo is shown, not clamped to 0)
   if (soilChartInst) soilChartInst.destroy();
   const ctx = document.getElementById('soil-chart').getContext('2d');
   soilChartInst = new Chart(ctx, {
@@ -988,8 +1052,8 @@ function calcSoil() {
           borderColor: '#00AFCC', borderWidth: 1, borderRadius: 4,
         },
         {
-          label: 'Igeo (×1 for scale)',
-          data: metals.map(m => Math.max(0, m.igeo)),
+          label: 'Igeo',
+          data: metals.map(m => m.igeo),
           backgroundColor: 'rgba(245,158,11,.7)',
           borderColor: '#F59E0B', borderWidth: 1, borderRadius: 4,
         }
@@ -1009,7 +1073,24 @@ function calcSoil() {
     }
   });
 
-  document.getElementById('soil-results').classList.remove('hidden');
+  // Ecological risk factor chart, bars coloured by Hakanson thresholds
+  if (soilErInst) soilErInst.destroy();
+  soilErInst = new Chart(document.getElementById('soil-er-chart').getContext('2d'), {
+    type: 'bar',
+    data: { labels: metals.map(m => m.sym),
+      datasets: [{ label: 'Ecological risk factor (Eᵣ)', data: metals.map(m => m.er),
+        backgroundColor: metals.map(m => erHex(m.er)), borderRadius: 4 }] },
+    options: { responsive: true,
+      plugins: { legend: { labels: { color: '#8BA3B8' } } },
+      scales: { x: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' } },
+        y: { beginAtZero: true, suggestedMax: 90, ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' },
+          title: { display: true, text: 'Eᵣ', color: '#8BA3B8' } } } },
+    plugins: [limitLines([
+      { y: 40,  color: '#F59E0B', label: 'Moderate ≥ 40' },
+      { y: 80,  color: '#F97316', label: 'Considerable ≥ 80' },
+      { y: 160, color: '#EF4444', label: 'Very high ≥ 160' } ])]
+  });
+
   document.getElementById('soil-results').scrollIntoView({ behavior:'smooth', block:'start' });
 }
 
