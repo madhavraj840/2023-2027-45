@@ -6,6 +6,9 @@
 <title>Heavy Metal Pollution Indices | SIH 2025 – Statement 25067</title>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600&family=Space+Mono&display=swap" rel="stylesheet" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<!-- Leaflet: open-source interactive map library (no API key needed) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <style>
   /* ── TOKENS ───────────────────────────────────────────── */
   :root {
@@ -233,6 +236,12 @@
   .chart-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem;margin-top:1rem}
   .chart-row .chart-wrap{margin-top:0}
   .chart-title{font-family:var(--font-h);font-size:.9rem;margin-bottom:.5rem}
+
+  /* site map (Leaflet) */
+  .map-box{height:380px;border-radius:6px;border:1px solid var(--border);background:var(--navy)}
+  .leaflet-container{font-family:var(--font-b)}
+  .leaflet-popup-content{margin:10px 14px;line-height:1.5;font-size:.8rem}
+  .leaflet-popup-content b{font-family:var(--font-h)}
 
   /* ── FORMULA BOX ─────────────────────────────────────── */
   .formula-box {
@@ -483,6 +492,12 @@
     <div class="chart-row">
       <div class="chart-wrap"><canvas id="upload-chart"></canvas></div>
       <div class="chart-wrap"><div class="chart-title">Samples by quality class</div><canvas id="upload-dist-chart"></canvas></div>
+    </div>
+    <div class="chart-wrap" style="margin-top:1rem;">
+      <div class="chart-title">Sampling sites map (coloured by HPI)</div>
+      <div id="upload-map" class="map-box"></div>
+      <div id="upload-map-note" class="note hidden"></div>
+      <div class="legend" id="upload-map-legend"></div>
     </div>
     <div class="heat" id="upload-heatmap"></div>
     <div id="upload-table" style="margin-top:1rem; overflow-x:auto;"></div>
@@ -773,7 +788,9 @@ async function sendCsv(file) {
     options: { responsive: true, plugins: { legend: { position: 'right', labels: { color: '#8BA3B8' } } } }
   });
 
-  renderHeatmap(await file.text());
+  const csvText = await file.text();
+  renderHeatmap(csvText);
+  renderMap(csvText, rows);
 }
 
 // ─── HEATMAP: sites × metals, coloured by Pi = concentration / standard ─
@@ -802,6 +819,64 @@ function renderHeatmap(text) {
     }).join('')}</tr>`).join('')}
     </tbody></table>
     <div class="legend">${HEAT.map(h => `<span><i style="background:${h[1]}"></i>${h[0]}</span>`).join('')}</div>`;
+}
+
+// ─── MAP: one marker per site, coloured by HPI class (Leaflet + OpenStreetMap data) ─
+let uploadMapInst = null;
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
+const HPI_CLASSES = [['< 10 Excellent','#22C55E'],['10 – 25 Good','#84CC16'],['25 – 50 Moderate','#F59E0B'],['50 – 100 Poor','#F97316'],['≥ 100 Critical','#EF4444']];
+
+function renderMap(text, rows) {
+  const mapEl = document.getElementById('upload-map');
+  const note = document.getElementById('upload-map-note');
+  const legend = document.getElementById('upload-map-legend');
+  if (uploadMapInst) { uploadMapInst.remove(); uploadMapInst = null; }
+  const showNote = msg => { mapEl.classList.add('hidden'); legend.innerHTML = ''; note.textContent = msg; note.classList.remove('hidden'); };
+  mapEl.classList.remove('hidden'); note.classList.add('hidden');
+  if (typeof L === 'undefined') { showNote('Map library could not load. Check your internet connection.'); return; }
+
+  // Coordinates come from the CSV itself (same parsing as the heatmap); HPI values come from the Flask API results
+  const lines = text.split(/\r?\n/).filter(l => l.trim());
+  const head = lines[0].split(',').map(h => h.trim().toLowerCase());
+  const iLat = head.indexOf('latitude'), iLng = head.indexOf('longitude'), iLoc = head.indexOf('location');
+  if (iLat < 0 || iLng < 0) { showNote('No latitude / longitude columns in this CSV, so no map can be drawn.'); return; }
+  const csv = lines.slice(1).map((l, n) => {
+    const c = l.split(',');
+    return { name: iLoc >= 0 ? (c[iLoc] || '').trim() : '', lat: parseFloat(c[iLat]), lng: parseFloat(c[iLng]) };
+  });
+  const byName = {};
+  csv.forEach(c => { if (c.name) byName[c.name] = c; });
+
+  // Join each API result to its CSV row (by row number, checked against the location name)
+  const pts = [];
+  rows.forEach(r => {
+    let c = csv[r.row - 1];
+    if (r.location && (!c || c.name !== r.location) && byName[r.location]) c = byName[r.location];
+    if (!c || isNaN(c.lat) || isNaN(c.lng) || Math.abs(c.lat) > 90 || Math.abs(c.lng) > 180) return;
+    pts.push({ r, lat: c.lat, lng: c.lng });
+  });
+  if (!pts.length) { showNote('No valid latitude / longitude values found, so no map can be drawn.'); return; }
+
+  uploadMapInst = L.map(mapEl, { scrollWheelZoom: false });   // wheel zoom off so page scrolling is not hijacked
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    subdomains: 'abcd', maxZoom: 19
+  }).addTo(uploadMapInst);
+
+  const group = L.featureGroup();
+  pts.sort((a, b) => a.r.hpi - b.r.hpi).forEach(p => {       // worst sites are drawn last, so they sit on top
+    const name = p.r.location || 'Row ' + p.r.row;
+    L.circleMarker([p.lat, p.lng], { radius: 9, color: '#fff', weight: 1.5, fillColor: HPI_HEX(p.r.hpi), fillOpacity: .9 })
+      .bindTooltip(esc(name))
+      .bindPopup(`<b>${esc(name)}</b><br>HPI: <b>${p.r.hpi}</b> (${esc(p.r.hpi_class)})<br>NPI: ${p.r.npi}<br>` +
+                 `<span style="color:#667">${p.lat.toFixed(4)}, ${p.lng.toFixed(4)}</span>`)
+      .addTo(group);
+  });
+  group.addTo(uploadMapInst);
+  uploadMapInst.fitBounds(group.getBounds(), { padding: [30, 30], maxZoom: 12 });
+  setTimeout(() => uploadMapInst.invalidateSize(), 0);        // make sure tiles fill the box after the container becomes visible
+
+  legend.innerHTML = HPI_CLASSES.map(h => `<span><i style="background:${h[1]}"></i>${h[0]}</span>`).join('');
 }
 
 function uploadCsv() {
