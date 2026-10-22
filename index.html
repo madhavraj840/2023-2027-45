@@ -27,7 +27,6 @@
     --font-b:  'Inter', sans-serif;
     --font-m:  'Space Mono', monospace;
   }
-
   /* ── RESET ───────────────────────────────────────────── */
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   html { scroll-behavior: smooth; }
@@ -39,7 +38,6 @@
     line-height: 1.6;
   }
   a { color: var(--teal); text-decoration: none; }
-
   /* ── NAV ─────────────────────────────────────────────── */
   nav {
     position: sticky; top: 0; z-index: 100;
@@ -61,7 +59,6 @@
     transition: color .2s;
   }
   .nav-links a:hover { color: var(--white); }
-
   /* ── HERO ────────────────────────────────────────────── */
   .hero {
     position: relative; overflow: hidden;
@@ -100,7 +97,6 @@
   .btn-primary:hover { background: #00CCEE; }
   .btn-outline { background: transparent; color: var(--teal); border: 1px solid var(--teal); }
   .btn-outline:hover { background: rgba(0,175,204,.1); }
-
   /* floating molecules */
   .mol {
     position: absolute; border-radius: 50%; opacity: .05;
@@ -111,7 +107,6 @@
     0%,100% { transform: translateY(0) scale(1); }
     50%      { transform: translateY(-18px) scale(1.05); }
   }
-
   /* ── INDEX CARDS (HERO STATS) ─────────────────────────── */
   .index-strip {
     display: flex; flex-wrap: wrap; gap: .6rem;
@@ -122,7 +117,6 @@
     background: var(--card); border: 1px solid var(--border);
     padding: .35rem .75rem; border-radius: 4px; color: var(--teal);
   }
-
   /* ── SECTION HELPERS ─────────────────────────────────── */
   section { padding: 3rem 2rem; }
   .container { max-width: 1060px; margin: 0 auto; }
@@ -136,7 +130,6 @@
     margin-bottom: .5rem;
   }
   .section-sub { color: var(--muted); font-size: .88rem; margin-bottom: 2rem; }
-
   /* ── TABS ────────────────────────────────────────────── */
   .tabs { display: flex; gap: .3rem; margin-bottom: 1.5rem; flex-wrap: wrap; }
   .tab {
@@ -148,7 +141,6 @@
   .tab.active { background: var(--teal); color: var(--navy); border-color: var(--teal); }
   .tab-panel { display: none; }
   .tab-panel.active { display: block; }
-
   /* ── METAL TABLE INPUT ────────────────────────────────── */
   .metal-grid {
     display: grid;
@@ -175,7 +167,6 @@
   }
   .metal-row input:focus { border-color: var(--teal); }
   .metal-row .unit { font-size: .65rem; color: var(--muted); text-align: right; }
-
   /* ── RESULTS ─────────────────────────────────────────── */
   .results-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
@@ -194,7 +185,6 @@
   .result-card.level-med::before  { background: var(--amber); }
   .result-card.level-high::before { background: #F97316; }
   .result-card.level-crit::before { background: var(--red); }
-
   .result-card h4 {
     font-family: var(--font-m); font-size: .68rem; color: var(--muted);
     text-transform: uppercase; letter-spacing: 1px; margin-bottom: .3rem;
@@ -215,7 +205,6 @@
   .result-card.level-med  .result-status { color: var(--amber); }
   .result-card.level-high .result-status { color: #F97316; }
   .result-card.level-crit .result-status { color: var(--red); }
-
   /* gauge */
   .gauge-wrap {
     display: flex; justify-content: center; margin: 1.5rem 0;
@@ -224,25 +213,21 @@
   .gauge-track { fill: none; stroke: var(--border); stroke-width: 16; }
   .gauge-fill  { fill: none; stroke-width: 16; stroke-linecap: round;
     transition: stroke-dashoffset 1s cubic-bezier(.4,0,.2,1), stroke .5s; }
-
   /* chart canvas */
   .chart-wrap {
     background: var(--card); border: 1px solid var(--border);
     border-radius: 8px; padding: 1rem; margin-top: 1rem;
   }
   .chart-wrap canvas { max-height: 280px; }
-
   /* chart rows (two charts side by side) */
   .chart-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem;margin-top:1rem}
   .chart-row .chart-wrap{margin-top:0}
   .chart-title{font-family:var(--font-h);font-size:.9rem;margin-bottom:.5rem}
-
   /* site map (Leaflet) */
   .map-box{height:380px;border-radius:6px;border:1px solid var(--border);background:var(--navy)}
   .leaflet-container{font-family:var(--font-b)}
   .leaflet-popup-content{margin:10px 14px;line-height:1.5;font-size:.8rem}
   .leaflet-popup-content b{font-family:var(--font-h)}
-
   /* ── FORMULA BOX ─────────────────────────────────────── */
   .formula-box {
     background: rgba(0,175,204,.05);
@@ -252,7 +237,6 @@
     color: var(--teal); margin-bottom: 1rem; line-height: 1.8;
   }
   .formula-box strong { color: var(--white); }
-
   /* ── CLASSIFICATION TABLE ────────────────────────────── */
   .ref-section { background: var(--navy2); }
   table { width: 100%; border-collapse: collapse; font-size: .83rem; }
@@ -269,7 +253,6 @@
     display: inline-block; width: 9px; height: 9px;
     border-radius: 50%; margin-right: 6px;
   }
-
   /* ── METALS INFO CARDS ─────────────────────────────────── */
   .info-grid {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -284,7 +267,6 @@
     margin-bottom: .4rem; color: var(--teal);
   }
   .info-card p { font-size: .78rem; color: var(--muted); line-height: 1.5; }
-
   /* ── ABOUT ────────────────────────────────────────────── */
   .about-wrap {
     display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;
@@ -294,7 +276,6 @@
     .about-wrap { grid-template-columns: 1fr; }
     .nav-links { display: none; }
   }
-
   /* ── FOOTER ──────────────────────────────────────────── */
   footer {
     background: var(--navy2); border-top: 1px solid var(--border);
@@ -303,7 +284,6 @@
     font-family: var(--font-m);
   }
   footer span { color: var(--teal); }
-
   /* ── MISC ─────────────────────────────────────────────── */
   .calc-btn {
     background: var(--teal); color: var(--navy);
@@ -343,7 +323,6 @@
 </style>
 </head>
 <body>
-
 <!-- ── NAV ─────────────────────────────────────────────── -->
 <nav>
   <div class="nav-brand">
@@ -358,13 +337,11 @@
     <a href="#about">About</a>
   </div>
 </nav>
-
 <!-- ── HERO ────────────────────────────────────────────── -->
 <section class="hero">
   <div class="mol" style="width:300px;height:300px;top:-80px;left:-60px;animation-delay:0s"></div>
   <div class="mol" style="width:180px;height:180px;top:20px;right:40px;animation-delay:3s"></div>
   <div class="mol" style="width:80px;height:80px;bottom:20px;left:30%;animation-delay:1.5s"></div>
-
   <div class="hero-badge">SIH 2025 — Problem Statement 25067</div>
   <h1>Design & Development of<br/><em>Heavy Metal Pollution Indices</em></h1>
   <p>A scientific tool to quantify, classify, and visualize heavy metal contamination in water and soil using established environmental indices.</p>
@@ -372,7 +349,6 @@
     <a href="#calculator" class="btn btn-primary">Open Calculator</a>
     <a href="#reference" class="btn btn-outline">View Classifications</a>
   </div>
-
   <div class="index-strip">
     <div class="index-chip">HPI — Water Pollution</div>
     <div class="index-chip">Nemerow Index</div>
@@ -382,19 +358,16 @@
     <div class="index-chip">RI — Ecological Risk</div>
   </div>
 </section>
-
 <!-- ── CALCULATOR ───────────────────────────────────────── -->
 <section id="calculator">
 <div class="container">
   <div class="section-label">Interactive Tool</div>
   <div class="section-title">Pollution Index Calculator</div>
   <div class="section-sub">Enter measured concentrations of heavy metals in your sample. All calculations follow internationally accepted environmental standards.</div>
-
   <div class="tabs">
     <button class="tab active" onclick="switchTab('water')">💧 Water Quality (HPI &amp; Nemerow)</button>
     <button class="tab" onclick="switchTab('soil')">🌍 Soil/Sediment (Igeo, CF, PLI, RI)</button>
   </div>
-
   <!-- ── WATER TAB ──────────────────────────────────────── -->
   <div id="tab-water" class="tab-panel active">
     <div class="formula-box">
@@ -403,19 +376,15 @@
       <strong>Nemerow Pollution Index (NPI)</strong><br/>
       NPI = √[(P̄²+ P²max) / 2] &nbsp;|&nbsp; Pᵢ = Cᵢ / Sᵢ &nbsp;(single-factor index)
     </div>
-
     <div class="tip"><b>Tip:</b> Leave any metal blank to exclude it from the calculation. Values in mg/L. Standard limits from WHO / BIS IS 10500.</div>
-
     <div class="metal-grid" id="water-inputs"></div>
     <div>
       <button class="calc-btn" onclick="calcWater()">Calculate Indices</button>
       <button class="reset-btn" onclick="resetWater()">Reset</button>
     </div>
-
     <div id="water-results" class="hidden">
       <div class="divider"></div>
       <div class="section-label">Results</div>
-
       <!-- Gauge -->
       <div class="gauge-wrap">
         <svg class="gauge-svg" viewBox="0 0 200 120">
@@ -430,18 +399,14 @@
           <text x="168" y="115" font-family="Space Mono" font-size="9" fill="#8BA3B8">300+</text>
         </svg>
       </div>
-
       <div class="results-grid" id="water-result-cards"></div>
-
       <div class="chart-row">
         <div class="chart-wrap"><canvas id="water-chart"></canvas></div>
         <div class="chart-wrap"><div class="chart-title">Share of each metal in HPI</div><canvas id="water-share-chart"></canvas></div>
       </div>
-
       <div id="water-detail-table" style="margin-top:1rem; overflow-x:auto;"></div>
     </div>
   </div>
-
   <!-- ── SOIL TAB ───────────────────────────────────────── -->
   <div id="tab-soil" class="tab-panel">
     <div class="formula-box">
@@ -450,15 +415,12 @@
       <strong>Pollution Load Index (PLI)</strong> = (CF₁ × CF₂ × … × CFₙ)^(1/n)<br/>
       <strong>Ecological Risk Factor (Eᵣ)</strong> = Tᵣ × CF &nbsp;|&nbsp; <strong>Risk Index (RI)</strong> = Σ Eᵣ
     </div>
-
     <div class="tip"><b>Tip:</b> Values in mg/kg (dry weight). Background values (Bₙ) are pre-filled with average shale composition. Edit if you have site-specific backgrounds.</div>
-
     <div id="soil-inputs-wrap"></div>
     <div>
       <button class="calc-btn" onclick="calcSoil()">Calculate Indices</button>
       <button class="reset-btn" onclick="resetSoil()">Reset</button>
     </div>
-
     <div id="soil-results" class="hidden">
       <div class="divider"></div>
       <div class="section-label">Results</div>
@@ -472,7 +434,6 @@
   </div>
 </div>
 </section>
-
 <!-- ── REFERENCE ────────────────────────────────────────── -->
 <!-- ── DATASET UPLOAD (Flask /api/upload) ───────────────── -->
 <section id="dataset">
@@ -504,13 +465,11 @@
   </div>
 </div>
 </section>
-
 <section id="reference" class="ref-section">
 <div class="container">
   <div class="section-label">Classification Tables</div>
   <div class="section-title">Pollution Level Reference</div>
   <div class="section-sub">Internationally accepted thresholds used in environmental assessment.</div>
-
   <div class="tabs">
     <button class="tab active" onclick="switchRefTab('hpi-ref')">HPI</button>
     <button class="tab" onclick="switchRefTab('npi-ref')">Nemerow</button>
@@ -518,7 +477,6 @@
     <button class="tab" onclick="switchRefTab('cf-ref')">CF</button>
     <button class="tab" onclick="switchRefTab('ri-ref')">RI / Eᵣ</button>
   </div>
-
   <div id="hpi-ref" class="tab-panel active">
     <table>
       <thead><tr><th>HPI Value</th><th>Quality Class</th><th>Action Required</th></tr></thead>
@@ -532,7 +490,6 @@
     </table>
     <p class="note">Critical threshold for HPI is 100, beyond which water is unfit for drinking (based on Mohan et al., 1996).</p>
   </div>
-
   <div id="npi-ref" class="tab-panel">
     <table>
       <thead><tr><th>NPI Value</th><th>Pollution Level</th><th>Description</th></tr></thead>
@@ -545,7 +502,6 @@
       </tbody>
     </table>
   </div>
-
   <div id="igeo-ref" class="tab-panel">
     <table>
       <thead><tr><th>Igeo Value</th><th>Class</th><th>Pollution Level</th></tr></thead>
@@ -561,7 +517,6 @@
     </table>
     <p class="note">After Müller (1969). Factor 1.5 in denominator accounts for natural fluctuations in background values.</p>
   </div>
-
   <div id="cf-ref" class="tab-panel">
     <table>
       <thead><tr><th>CF Value</th><th>Contamination Level</th></tr></thead>
@@ -574,7 +529,6 @@
     </table>
     <p class="note">PLI &lt; 1 = no contamination; PLI = 1 = baseline; PLI &gt; 1 = progressive deterioration.</p>
   </div>
-
   <div id="ri-ref" class="tab-panel">
     <table>
       <thead><tr><th>Eᵣ (Single Metal)</th><th>RI (All Metals)</th><th>Ecological Risk</th></tr></thead>
@@ -589,7 +543,6 @@
   </div>
 </div>
 </section>
-
 <!-- ── METALS INFO ───────────────────────────────────────── -->
 <section id="metals">
 <div class="container">
@@ -610,7 +563,6 @@
   </div>
 </div>
 </section>
-
 <!-- ── ABOUT ─────────────────────────────────────────────── -->
 <section id="about" style="background:var(--navy2); border-top:1px solid var(--border)">
 <div class="container">
@@ -653,14 +605,12 @@
   </div>
 </div>
 </section>
-
 <!-- ── FOOTER ──────────────────────────────────────────────── -->
 <footer>
   <span>HMPIx</span> — Heavy Metal Pollution Indices Calculator &nbsp;|&nbsp;
   SIH 2025 Problem Statement <span>25067</span> &nbsp;|&nbsp;
   Built for environmental assessment research
 </footer>
-
 <!-- ── JAVASCRIPT ─────────────────────────────────────────── -->
 <script>
 // ─── DATA ──────────────────────────────────────────────────
@@ -676,7 +626,6 @@ const METALS_WATER = [
   { id:'zn', name:'Zinc',    sym:'Zn', std:3.0,   ideal:0.1,  unit:'mg/L' },
   { id:'hg', name:'Mercury', sym:'Hg', std:0.001, ideal:0,    unit:'mg/L' },
 ];
-
 const METALS_SOIL = [
   { id:'as_s', name:'Arsenic', sym:'As', bg:13,    tr:10, unit:'mg/kg' },
   { id:'cd_s', name:'Cadmium', sym:'Cd', bg:0.3,   tr:30, unit:'mg/kg' },
@@ -689,17 +638,14 @@ const METALS_SOIL = [
   { id:'zn_s', name:'Zinc',    sym:'Zn', bg:95,    tr:1,  unit:'mg/kg' },
   { id:'hg_s', name:'Mercury', sym:'Hg', bg:0.4,   tr:40, unit:'mg/kg' },
 ];
-
 // ─── BACKEND API ───────────────────────────────────────────
 // Served by Flask -> same origin; opened as a local file -> talk to the local Flask server
 const API = location.protocol === 'file:' ? 'http://127.0.0.1:5000' : '';
 const HPI_HEX = h => h<10?'#22C55E':h<25?'#84CC16':h<50?'#F59E0B':h<100?'#F97316':'#EF4444';
-
 // ─── CHART HELPERS ─────────────────────────────────────────
 let waterShareInst = null, soilErInst = null, uploadDistInst = null;
 const PALETTE = ['#00AFCC','#F59E0B','#EF4444','#22C55E','#8B5CF6','#EC4899','#84CC16','#F97316','#3B82F6','#14B8A6'];
 const erHex = e => e<40?'#22C55E':e<80?'#F59E0B':e<160?'#F97316':'#EF4444';
-
 // dependency-free replacement for chartjs-plugin-annotation
 const limitLines = lines => ({
   id: 'limitLines',
@@ -717,7 +663,6 @@ const limitLines = lines => ({
     ctx.restore();
   }
 });
-
 async function checkApi() {
   const el = document.getElementById('api-status');
   try {
@@ -728,7 +673,6 @@ async function checkApi() {
     el.textContent = '● API: offline'; el.style.color = 'var(--red)';
   }
 }
-
 let uploadChartInst = null;
 async function sendCsv(file) {
   const msg = document.getElementById('upload-msg');
@@ -775,7 +719,6 @@ async function sendCsv(file) {
       scales: { x: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' } },
                 y: { ticks: { color: '#8BA3B8' }, grid: { color: '#1E3A55' }, title: { display: true, text: 'HPI', color: '#8BA3B8' } } } }
   });
-
   // Samples-by-quality-class distribution
   const counts = {};
   rows.forEach(r => { (counts[r.hpi_class] ||= { n: 0, hex: HPI_HEX(r.hpi) }).n++; });
@@ -787,16 +730,13 @@ async function sendCsv(file) {
         backgroundColor: Object.values(counts).map(c => c.hex), borderColor: '#112236' }] },
     options: { responsive: true, plugins: { legend: { position: 'right', labels: { color: '#8BA3B8' } } } }
   });
-
   const csvText = await file.text();
   renderHeatmap(csvText);
   renderMap(csvText, rows);
 }
-
 // ─── HEATMAP: sites × metals, coloured by Pi = concentration / standard ─
 const HEAT = [['< 0.5','#1F5C4B'],['0.5 – 1','#4C9A5B'],['1 – 2','#C9A227'],['2 – 5','#E0742B'],['> 5','#C93A3A']];
 const heatColor = p => p<0.5?HEAT[0][1]:p<1?HEAT[1][1]:p<2?HEAT[2][1]:p<5?HEAT[3][1]:HEAT[4][1];
-
 function renderHeatmap(text) {
   const lines = text.split(/\r?\n/).filter(l => l.trim());
   const head = lines[0].split(',').map(h => h.trim().toLowerCase());
@@ -820,12 +760,10 @@ function renderHeatmap(text) {
     </tbody></table>
     <div class="legend">${HEAT.map(h => `<span><i style="background:${h[1]}"></i>${h[0]}</span>`).join('')}</div>`;
 }
-
 // ─── MAP: one marker per site, coloured by HPI class (Leaflet + OpenStreetMap data) ─
 let uploadMapInst = null;
 const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c]));
 const HPI_CLASSES = [['< 10 Excellent','#22C55E'],['10 – 25 Good','#84CC16'],['25 – 50 Moderate','#F59E0B'],['50 – 100 Poor','#F97316'],['≥ 100 Critical','#EF4444']];
-
 function renderMap(text, rows) {
   const mapEl = document.getElementById('upload-map');
   const note = document.getElementById('upload-map-note');
@@ -834,7 +772,6 @@ function renderMap(text, rows) {
   const showNote = msg => { mapEl.classList.add('hidden'); legend.innerHTML = ''; note.textContent = msg; note.classList.remove('hidden'); };
   mapEl.classList.remove('hidden'); note.classList.add('hidden');
   if (typeof L === 'undefined') { showNote('Map library could not load. Check your internet connection.'); return; }
-
   // Coordinates come from the CSV itself (same parsing as the heatmap); HPI values come from the Flask API results
   const lines = text.split(/\r?\n/).filter(l => l.trim());
   const head = lines[0].split(',').map(h => h.trim().toLowerCase());
@@ -846,7 +783,6 @@ function renderMap(text, rows) {
   });
   const byName = {};
   csv.forEach(c => { if (c.name) byName[c.name] = c; });
-
   // Join each API result to its CSV row (by row number, checked against the location name)
   const pts = [];
   rows.forEach(r => {
@@ -856,13 +792,11 @@ function renderMap(text, rows) {
     pts.push({ r, lat: c.lat, lng: c.lng });
   });
   if (!pts.length) { showNote('No valid latitude / longitude values found, so no map can be drawn.'); return; }
-
   uploadMapInst = L.map(mapEl, { scrollWheelZoom: false });   // wheel zoom off so page scrolling is not hijacked
   L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     subdomains: 'abcd', maxZoom: 19
   }).addTo(uploadMapInst);
-
   const group = L.featureGroup();
   pts.sort((a, b) => a.r.hpi - b.r.hpi).forEach(p => {       // worst sites are drawn last, so they sit on top
     const name = p.r.location || 'Row ' + p.r.row;
@@ -875,16 +809,13 @@ function renderMap(text, rows) {
   group.addTo(uploadMapInst);
   uploadMapInst.fitBounds(group.getBounds(), { padding: [30, 30], maxZoom: 12 });
   setTimeout(() => uploadMapInst.invalidateSize(), 0);        // make sure tiles fill the box after the container becomes visible
-
   legend.innerHTML = HPI_CLASSES.map(h => `<span><i style="background:${h[1]}"></i>${h[0]}</span>`).join('');
 }
-
 function uploadCsv() {
   const f = document.getElementById('csv-file').files[0];
   if (!f) { alert('Choose a .csv file first.'); return; }
   sendCsv(f);
 }
-
 async function uploadSample() {
   try {
     const r = await fetch(API + '/data/sample_water_samples.csv');
@@ -894,7 +825,6 @@ async function uploadSample() {
     document.getElementById('upload-msg').textContent = '✗ Backend not reachable. Run: python backend/app.py';
   }
 }
-
 // ─── TAB SWITCHING ─────────────────────────────────────────
 function switchTab(id) {
   document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
@@ -909,7 +839,6 @@ function switchRefTab(id) {
   parent.querySelector('#'+id).classList.add('active');
   event.target.classList.add('active');
 }
-
 // ─── BUILD WATER INPUTS ──────────────────────────────────
 function buildWaterInputs() {
   const grid = document.getElementById('water-inputs');
@@ -920,7 +849,6 @@ function buildWaterInputs() {
       <div class="unit">${m.unit} — WHO/BIS limit: ${m.std}</div>
     </div>`).join('');
 }
-
 // ─── BUILD SOIL INPUTS ───────────────────────────────────
 function buildSoilInputs() {
   const wrap = document.getElementById('soil-inputs-wrap');
@@ -940,7 +868,6 @@ function buildSoilInputs() {
         </div>`).join('')}
     </div>`;
 }
-
 // ─── WATER CALCULATION ────────────────────────────────────
 let waterChartInst = null;
 async function calcWater() {
@@ -950,20 +877,16 @@ async function calcWater() {
     if (!isNaN(v) && v >= 0) metals.push({ ...m, val: v });
   }
   if (metals.length === 0) { alert('Please enter at least one metal concentration.'); return; }
-
   // Single-factor pollution index Pi
   metals.forEach(m => m.Pi = m.val / m.std);
-
   // HPI
   const Wi = metals.map(m => 1 / m.std);
   const Qi = metals.map(m => Math.max(0, 100 * (m.val - m.ideal) / (m.std - m.ideal)));
   let hpi = Wi.reduce((a,w,i) => a + w*Qi[i], 0) / Wi.reduce((a,w) => a+w, 0);
-
   // Nemerow
   const Pave = metals.reduce((a,m) => a + m.Pi, 0) / metals.length;
   const Pmax = Math.max(...metals.map(m => m.Pi));
   let npi  = Math.sqrt((Pave*Pave + Pmax*Pmax) / 2);
-
   // Official values come from the Flask backend (backend/hpi.py); browser maths is the offline fallback
   let source = 'Browser (API offline)';
   try {
@@ -973,7 +896,6 @@ async function calcWater() {
     });
     if (r.ok) { const d = await r.json(); hpi = d.hpi; npi = d.npi; source = 'Flask API'; }
   } catch (e) {}
-
   // Gauge update
   const norm = Math.min(hpi / 300, 1);
   const ARC_LEN = 251;
@@ -983,7 +905,6 @@ async function calcWater() {
   gaugePath.style.strokeDashoffset = offset;
   gaugePath.style.stroke = hpiColor(hpi);
   gaugeVal.textContent = hpi.toFixed(1);
-
   // Cards
   const cardsEl = document.getElementById('water-result-cards');
   cardsEl.innerHTML = `
@@ -992,7 +913,6 @@ async function calcWater() {
     ${resultCard('Metals Analysed', metals.length, '', '')}
     ${resultCard('Computed By', source, source === 'Flask API' ? 'level-low' : 'level-med', source === 'Flask API' ? 'POST /api/calculate' : 'start: python backend/app.py')}
     ${resultCard('Worst Single Metal', metals.reduce((a,m) => m.Pi>a.Pi?m:a, metals[0]).name + ' (' + metals.reduce((a,m) => m.Pi>a.Pi?m:a, metals[0]).sym + ')', npiLevel(Math.max(...metals.map(m=>m.Pi))), 'P = '+Math.max(...metals.map(m=>m.Pi)).toFixed(3))}`;
-
   // Detail table
   const tbl = document.getElementById('water-detail-table');
   tbl.innerHTML = `<table>
@@ -1010,10 +930,8 @@ async function calcWater() {
         </tr>`).join('')}
     </tbody>
   </table>`;
-
   // Show results first so the charts are created in a visible container
   document.getElementById('water-results').classList.remove('hidden');
-
   // Pi bar chart with a drawn Pi = 1 limit line
   if (waterChartInst) waterChartInst.destroy();
   const ctx = document.getElementById('water-chart').getContext('2d');
@@ -1047,7 +965,6 @@ async function calcWater() {
     },
     plugins: [limitLines([{ y: 1, color: '#F59E0B', label: 'Limit (Pi = 1)' }])]
   });
-
   // Contribution of each metal to the HPI numerator (Wi × Qi)
   if (waterShareInst) waterShareInst.destroy();
   const contrib = metals.map((m, i) => Wi[i] * Qi[i]);
@@ -1060,10 +977,8 @@ async function calcWater() {
       plugins: { legend: { position: 'right', labels: { color: '#8BA3B8' } },
         tooltip: { callbacks: { label: c => ` ${c.label}: ${tot ? (c.parsed / tot * 100).toFixed(1) : 0}%` } } } }
   });
-
   document.getElementById('water-results').scrollIntoView({ behavior:'smooth', block:'start' });
 }
-
 // ─── SOIL CALCULATION ─────────────────────────────────────
 let soilChartInst = null;
 function calcSoil() {
@@ -1079,17 +994,14 @@ function calcSoil() {
     }
   }
   if (metals.length === 0) { alert('Please enter at least one measured concentration.'); return; }
-
   const PLI = Math.pow(metals.reduce((a,m) => a * m.cf, 1), 1/metals.length);
   const RI  = metals.reduce((a,m) => a + m.er, 0);
-
   const cardsEl = document.getElementById('soil-result-cards');
   cardsEl.innerHTML = `
     ${resultCard('Pollution Load Index', PLI.toFixed(3), pliLevel(PLI), pliLabel(PLI))}
     ${resultCard('Risk Index (RI)', RI.toFixed(2), riLevel(RI), riLabel(RI))}
     ${resultCard('Metals Analysed', metals.length, '', '')}
     ${resultCard('Highest Igeo Metal', metals.reduce((a,m) => m.igeo>a.igeo?m:a, metals[0]).name + ' (' + metals.reduce((a,m) => m.igeo>a.igeo?m:a, metals[0]).sym + ')', igeoLevel(Math.max(...metals.map(m=>m.igeo))), 'Igeo = '+Math.max(...metals.map(m=>m.igeo)).toFixed(2))}`;
-
   // Detail table
   const tbl = document.getElementById('soil-detail-table');
   tbl.innerHTML = `<table>
@@ -1108,10 +1020,8 @@ function calcSoil() {
         </tr>`).join('')}
     </tbody>
   </table>`;
-
   // Show results first so the charts are created in a visible container
   document.getElementById('soil-results').classList.remove('hidden');
-
   // Chart — CF and Igeo (negative Igeo is shown, not clamped to 0)
   if (soilChartInst) soilChartInst.destroy();
   const ctx = document.getElementById('soil-chart').getContext('2d');
@@ -1147,7 +1057,6 @@ function calcSoil() {
       }
     }
   });
-
   // Ecological risk factor chart, bars coloured by Hakanson thresholds
   if (soilErInst) soilErInst.destroy();
   soilErInst = new Chart(document.getElementById('soil-er-chart').getContext('2d'), {
@@ -1165,10 +1074,8 @@ function calcSoil() {
       { y: 80,  color: '#F97316', label: 'Considerable ≥ 80' },
       { y: 160, color: '#EF4444', label: 'Very high ≥ 160' } ])]
   });
-
   document.getElementById('soil-results').scrollIntoView({ behavior:'smooth', block:'start' });
 }
-
 // ─── RESET ─────────────────────────────────────────────────
 function resetWater() {
   document.getElementById('water-results').classList.add('hidden');
@@ -1181,7 +1088,6 @@ function resetSoil() {
     const b = document.getElementById('s_b_'+m.id); if(b) b.value = m.bg;
   });
 }
-
 // ─── HELPERS ───────────────────────────────────────────────
 function resultCard(label, val, levelClass, status) {
   return `<div class="result-card ${levelClass}">
@@ -1190,20 +1096,15 @@ function resultCard(label, val, levelClass, status) {
     ${status ? `<div class="result-status">${status}</div>` : ''}
   </div>`;
 }
-
 function hpiColor(h)  { return h<10?'var(--green)':h<25?'#84CC16':h<50?'var(--amber)':h<100?'#F97316':'var(--red)'; }
 function hpiLevel(h)  { return h<10?'level-low':h<50?'level-med':h<100?'level-high':'level-crit'; }
 function hpiLabel(h)  { return h<10?'✓ Excellent':h<25?'✓ Good':h<50?'⚠ Moderate':h<100?'⚠ Poor':'✗ Critical — Unfit'; }
-
 function npiLevel(n)  { return n<0.7?'level-low':n<1?'level-med':n<2?'level-high':'level-crit'; }
 function npiLabel(n)  { return n<0.7?'✓ Not Polluted':n<1?'⚠ Warning Level':n<2?'⚠ Lightly Polluted':n<3?'✗ Moderately Polluted':'✗ Heavily Polluted'; }
-
 function pliLevel(p)  { return p<1?'level-low':p<2?'level-med':p<3?'level-high':'level-crit'; }
 function pliLabel(p)  { return p<1?'✓ No Contamination':p<2?'⚠ Progressive Deterioration':p<3?'⚠ Considerable':'✗ Severely Polluted'; }
-
 function riLevel(r)   { return r<150?'level-low':r<300?'level-med':r<600?'level-high':'level-crit'; }
 function riLabel(r)   { return r<150?'✓ Low Risk':r<300?'⚠ Moderate Risk':r<600?'⚠ Considerable Risk':'✗ Very High Risk'; }
-
 function cfColor(c)   { return c<1?'var(--green)':c<3?'var(--amber)':c<6?'#F97316':'var(--red)'; }
 function igeoColor(v) { return v<=0?'var(--green)':v<=1?'#84CC16':v<=2?'var(--amber)':v<=3?'#F59E0B':v<=4?'#F97316':'var(--red)'; }
 function erColor(e)   { return e<40?'var(--green)':e<80?'var(--amber)':e<160?'#F97316':'var(--red)'; }
@@ -1217,7 +1118,6 @@ function igeoClassLabel(v) {
   if (v<=5) return 'Class 5 – Heavy–Extreme';
   return 'Class 6 – Extreme';
 }
-
 // ─── INIT ──────────────────────────────────────────────────
 buildWaterInputs();
 buildSoilInputs();
