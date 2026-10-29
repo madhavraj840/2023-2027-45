@@ -1123,5 +1123,169 @@ buildWaterInputs();
 buildSoilInputs();
 checkApi();
 </script>
+<!-- ── EXPORT (PNG / PDF / CSV) ─────────────────────────── -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+/* HMPIx export add-on: PNG (per chart, map, section), PDF report, CSV.
+   Needs html2canvas and jsPDF loaded BEFORE this file (see the 3 script tags). */
+(() => {
+  const BG = '#0B1F33';
+  const stamp = () => new Date().toISOString().slice(0, 10);
+
+  // ---- styles -----------------------------------------------------------
+  const css = document.createElement('style');
+  css.textContent = `
+    .export-bar{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:0 0 1rem}
+    .export-bar .lbl{font-family:var(--font-m);font-size:.68rem;color:var(--muted);letter-spacing:1px;text-transform:uppercase;margin-right:.3rem}
+    .exp-btn{background:transparent;color:var(--teal);border:1px solid var(--teal);border-radius:5px;
+      padding:.35rem .8rem;font-family:var(--font-h);font-size:.75rem;font-weight:600;cursor:pointer;transition:all .2s}
+    .exp-btn:hover{background:rgba(0,175,204,.12)}
+    .exp-btn:disabled{opacity:.5;cursor:wait}
+    .exp-mini{position:absolute;top:8px;right:8px;z-index:500;padding:.2rem .55rem;font-size:.68rem;
+      background:rgba(11,31,51,.85)}
+  `;
+  document.head.appendChild(css);
+
+  // ---- helpers ----------------------------------------------------------
+  function download(url, name) {
+    const a = document.createElement('a');
+    a.href = url; a.download = name;
+    document.body.appendChild(a); a.click(); a.remove();
+  }
+
+  const skip = e => e.classList && (e.classList.contains('export-bar') || e.classList.contains('exp-mini'));
+
+  function shot(el) {
+    return html2canvas(el, {
+      backgroundColor: BG, scale: 2, useCORS: true, logging: false, ignoreElements: skip,
+    });
+  }
+
+  // a busy button helper so users see something is happening
+  async function busy(btn, fn) {
+    const old = btn.textContent;
+    btn.disabled = true; btn.textContent = 'Working…';
+    try { await fn(); }
+    catch (e) { console.error(e); alert('Export failed: ' + (e.message || e)); }
+    finally { btn.disabled = false; btn.textContent = old; }
+  }
+
+  // ---- PNG: one Chart.js canvas (flattened onto a dark background) ------
+  function chartPng(canvas) {
+    const tmp = document.createElement('canvas');
+    tmp.width = canvas.width; tmp.height = canvas.height;
+    const c = tmp.getContext('2d');
+    c.fillStyle = '#112236'; c.fillRect(0, 0, tmp.width, tmp.height);
+    c.drawImage(canvas, 0, 0);
+    download(tmp.toDataURL('image/png'), `${canvas.id || 'chart'}_${stamp()}.png`);
+  }
+
+  // ---- PNG: any element (map, whole results section) --------------------
+  async function elementPng(el, name) {
+    const cv = await shot(el);
+    download(cv.toDataURL('image/png'), `${name}_${stamp()}.png`);
+  }
+
+  // ---- PDF: capture a results section, slice it across A4 pages ---------
+  async function pdfReport(root, title) {
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ unit: 'mm', format: 'a4' });
+    const W = pdf.internal.pageSize.getWidth();
+    const H = pdf.internal.pageSize.getHeight();
+    const M = 10, HEADER = 18;
+    const paint = () => { pdf.setFillColor(11, 31, 51); pdf.rect(0, 0, W, H, 'F'); };
+
+    paint();
+    pdf.setTextColor(0, 175, 204); pdf.setFontSize(16);
+    pdf.text('HMPIx - ' + title, M, 14);
+    pdf.setTextColor(139, 163, 184); pdf.setFontSize(9);
+    pdf.text('Generated ' + new Date().toLocaleString() + '  |  SIH 2025 - Statement 25067', M, 19);
+
+    const cv = await shot(root);
+    const imgW = W - 2 * M;
+    const mmPerPx = imgW / cv.width;
+    let y = 0, first = true;
+    while (y < cv.height) {
+      const top = first ? M + HEADER : M;
+      const sliceH = Math.min(cv.height - y, Math.floor((H - top - M) / mmPerPx));
+      const part = document.createElement('canvas');
+      part.width = cv.width; part.height = sliceH;
+      part.getContext('2d').drawImage(cv, 0, y, cv.width, sliceH, 0, 0, cv.width, sliceH);
+      pdf.addImage(part.toDataURL('image/png'), 'PNG', M, top, imgW, sliceH * mmPerPx);
+      y += sliceH; first = false;
+      if (y < cv.height) { pdf.addPage(); paint(); }
+    }
+    pdf.save(`HMPIx_${title.replace(/\W+/g, '_')}_${stamp()}.pdf`);
+  }
+
+  // ---- CSV: the visible results table -----------------------------------
+  function tableCsv(table, name) {
+    const rows = [...table.querySelectorAll('tr')].map(tr =>
+      [...tr.children].map(td => '"' + td.innerText.replace(/\s+/g, ' ').trim().replace(/"/g, '""') + '"').join(','));
+    const url = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' }));
+    download(url, `${name}_${stamp()}.csv`);
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+
+  // ---- UI wiring --------------------------------------------------------
+  function button(label, onClick, cls) {
+    const b = document.createElement('button');
+    b.className = 'exp-btn ' + (cls || ''); b.textContent = label;
+    b.onclick = () => busy(b, () => onClick(b));
+    return b;
+  }
+
+  function init() {
+    if (typeof html2canvas === 'undefined' || !window.jspdf) {
+      console.warn('export.js: html2canvas / jsPDF not loaded, export buttons disabled.');
+      return;
+    }
+    const sections = [
+      { id: 'water-results',  title: 'Water Quality Report',  table: '#water-detail-table table' },
+      { id: 'soil-results',   title: 'Soil Assessment Report', table: '#soil-detail-table table' },
+      { id: 'upload-results', title: 'Dataset Analysis Report', table: '#upload-table table' },
+    ];
+    sections.forEach(s => {
+      const root = document.getElementById(s.id);
+      if (!root) return;
+      const bar = document.createElement('div');
+      bar.className = 'export-bar';
+      bar.innerHTML = '<span class="lbl">Export</span>';
+      bar.append(
+        button('PDF report', () => pdfReport(root, s.title)),
+        button('PNG (full section)', () => elementPng(root, s.id)),
+        button('CSV (table)', () => {
+          const t = root.querySelector(s.table);
+          if (!t) throw new Error('No table to export yet.');
+          tableCsv(t, s.id);
+        })
+      );
+      root.prepend(bar);
+    });
+
+    // per-chart PNG buttons
+    document.querySelectorAll('.chart-wrap').forEach(w => {
+      const cv = w.querySelector('canvas');
+      if (!cv) return;
+      w.style.position = 'relative';
+      const b = button('PNG', () => chartPng(cv), 'exp-mini');
+      w.appendChild(b);
+    });
+
+    // map PNG button
+    const map = document.getElementById('upload-map');
+    if (map) {
+      const holder = map.parentElement;
+      holder.style.position = 'relative';
+      holder.appendChild(button('Map PNG', () => elementPng(map, 'sampling_map'), 'exp-mini'));
+    }
+  }
+
+  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+</script>
 </body>
 </html>
