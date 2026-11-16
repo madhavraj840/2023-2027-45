@@ -1,0 +1,56 @@
+{
+  "model_name": "RF",
+  "target": "PLI",
+  "features": [
+    "latitude",
+    "longitude",
+    "soil_pH",
+    "organic_carbon_pct",
+    "gw_nearest_km",
+    "gw_pH",
+    "gw_EC",
+    "gw_CO3",
+    "gw_HCO3",
+    "gw_Alkalinity",
+    "gw_Cl",
+    "gw_SO4",
+    "gw_Hardness",
+    "gw_Ca",
+    "gw_Mg",
+    "gw_Na",
+    "gw_Fe",
+    "land_use"
+  ],
+  "land_use_categories": [
+    "Agricultural",
+    "Industrial",
+    "Urban"
+  ],
+  "best_params": {
+    "n_estimators": "100",
+    "min_samples_leaf": "5",
+    "max_features": "0.4",
+    "max_depth": "6"
+  },
+  "test_metrics": {
+    "R2": 0.48174968544318875,
+    "RMSE": 0.2805342933586146,
+    "MAE": 0.20836763299775887,
+    "Polluted/not accuracy": 0.789
+  },
+  "leave_one_area_out_metrics": {
+    "R2": 0.41812514377463006,
+    "RMSE": 0.2899267284303657,
+    "MAE": 0.21990217557612904,
+    "Polluted/not accuracy": 0.7271454290858171
+  },
+  "all_models_test_r2": {
+    "LR": 0.4804042971698388,
+    "RF": 0.48174968544318875,
+    "SVM": 0.46359786862939767,
+    "ANN": 0.4694946825914893
+  },
+  "sklearn_version": "1.9.1",
+  "python_version": "3.13.4",
+  "note": "Soil data is SIMULATED (4,999 rows). Groundwater chemistry is joined by location; the CGWB file has no heavy-metal data. Treat metrics as a pipeline demonstration."
+}

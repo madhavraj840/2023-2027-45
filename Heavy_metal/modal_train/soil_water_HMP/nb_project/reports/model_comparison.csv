@@ -1,0 +1,5 @@
+Model,CV RMSE,R2,RMSE,MAE,Polluted/not accuracy,Best parameters,Unseen-area RMSE,Unseen-area R2
+LR,0.2715,0.4804,0.2809,0.209,0.788,{'fit_intercept': True},0.5241,-0.9266
+RF,0.2739,0.4817,0.2805,0.2084,0.789,"{'n_estimators': 100, 'min_samples_leaf': 5, 'max_features': 0.4, 'max_depth': 6}",0.2927,0.3991
+SVM,0.2741,0.4636,0.2854,0.2086,0.788,"{'gamma': 0.01, 'epsilon': 0.05, 'C': 10}",0.3595,0.0934
+ANN,0.2755,0.4695,0.2838,0.2108,0.789,"{'learning_rate_init': 0.003, 'hidden_layer_sizes': (32,), 'alpha': 0.1, 'activation': 'relu'}",0.4534,-0.4416
